@@ -21,6 +21,7 @@ Esta tabla es un resumen legible de ese historial, actualizado a medida que avan
 | 2026-08-23 | `services/catalogo/app/main.py`, `services/catalogo/app/schemas.py`, `services/catalogo/requirements.txt` | IA (edición sobre código previo) | Claude añadió los chequeos de ownership y las dependencias de rol sobre el CRUD que ya existía. |
 | 2026-08-23 | `services/ordenes/app/main.py`, `services/ordenes/app/schemas.py`, `services/ordenes/requirements.txt` | IA (edición sobre código previo) | Igual que arriba, para el servicio de órdenes. |
 | 2026-08-23 | `services/ordenes/app/database.py`, `services/ordenes/app/models.py`, `services/catalogo/app/models.py` | Yo | No tocados por la IA en esta sesión — se mantienen como estaban. |
+| 2026-08-23 | `services/auth/app/main.py`, `services/catalogo/app/main.py`, `services/ordenes/app/main.py` (CORS) | IA | Claude agregó `CORSMiddleware` en los 3 servicios para que el frontend en localhost pueda llamarlos. |
 | | `frontend/` | Yo | Pendiente de empezar — plan es que sea 100% escrito a mano. |
 | | Función autoaprendida (notificación de email por baja de precio en wishlist) | Yo | Pendiente — Claude solo debe explicar el concepto (APScheduler, integración de email), no escribir el código final. |
 
