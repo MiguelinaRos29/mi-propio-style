@@ -22,6 +22,8 @@ Esta tabla es un resumen legible de ese historial, actualizado a medida que avan
 | 2026-08-23 | `services/ordenes/app/main.py`, `services/ordenes/app/schemas.py`, `services/ordenes/requirements.txt` | IA (edición sobre código previo) | Igual que arriba, para el servicio de órdenes. |
 | 2026-08-23 | `services/ordenes/app/database.py`, `services/ordenes/app/models.py`, `services/catalogo/app/models.py` | Yo | No tocados por la IA en esta sesión — se mantienen como estaban. |
 | 2026-08-23 | `services/auth/app/main.py`, `services/catalogo/app/main.py`, `services/ordenes/app/main.py` (CORS) | IA | Claude agregó `CORSMiddleware` en los 3 servicios para que el frontend en localhost pueda llamarlos. |
+| 2026-08-23 | `frontend/` scaffolding (Vite, `npm create vite`) | Herramienta | Boilerplate generado por `create-vite`, sin autoría de nadie en particular — no cuenta como código de IA ni mío. |
+| 2026-08-23 | `frontend/vite.config.js`, `frontend/src/index.css` (theme Tailwind), `frontend/.env.example` | IA | Claude instaló y conectó el plugin de Tailwind, definió los tokens de color terracota/café/dorado, y las variables `VITE_*` con las URLs de los 3 backends. |
 | | `frontend/` | Yo | Pendiente de empezar — plan es que sea 100% escrito a mano. |
 | | Función autoaprendida (notificación de email por baja de precio en wishlist) | Yo | Pendiente — Claude solo debe explicar el concepto (APScheduler, integración de email), no escribir el código final. |
 
