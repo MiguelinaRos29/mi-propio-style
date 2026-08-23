@@ -13,7 +13,7 @@ class ProductoBase(BaseModel):
 
 
 class ProductoCrear(ProductoBase):
-    vendedor_id: int
+    pass
 
 
 class ProductoRespuesta(ProductoBase):
@@ -23,3 +23,58 @@ class ProductoRespuesta(ProductoBase):
 
     class Config:
         from_attributes = True
+
+
+class TallaBase(BaseModel):
+    talla: str
+    stock_talla: int = 0
+
+
+class TallaCrear(TallaBase):
+    producto_id: int
+
+
+class TallaRespuesta(TallaBase):
+    id: int
+    producto_id: int
+
+    class Config:
+        from_attributes = True
+
+
+class WishlistBase(BaseModel):
+    notificado: Optional[bool] = False
+
+
+class WishlistCrear(WishlistBase):
+    producto_id: int
+
+
+class WishlistRespuesta(WishlistBase):
+    id: int
+    usuario_id: int
+    producto_id: int
+    fecha_agregado: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ResenaBase(BaseModel):
+    calificacion: int
+    comentario: Optional[str] = None
+
+
+class ResenaCrear(ResenaBase):
+    producto_id: int
+
+
+class ResenaRespuesta(ResenaBase):
+    id: int
+    producto_id: int
+    usuario_id: int
+    fecha: datetime
+
+    class Config:
+        from_attributes = True
+
