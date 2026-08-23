@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --color-terracota: #c1502e;
+  --color-terracota-light: #e08a63;
+  --color-terracota-dark: #8f3a1f;
+
+  --color-cafe: #4a3428;
+  --color-cafe-light: #7a5c47;
+  --color-cafe-dark: #2c1e16;
+
+  --color-dorado: #c9a227;
+  --color-dorado-light: #e3c565;
+  --color-dorado-dark: #97781a;
+}
