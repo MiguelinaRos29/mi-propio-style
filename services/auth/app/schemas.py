@@ -1,28 +1,17 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
-from enum import Enum
 
 
-class RolUsuario(str, Enum):
-    comprador = "comprador"
-    vendedor = "vendedor"
-    admin = "admin"
-
-
-class UsuarioBase(BaseModel):
-    nombre: str
+class UserCreate(BaseModel):
     email: EmailStr
-
-
-class UsuarioCrear(UsuarioBase):
     password: str
-    rol: RolUsuario = RolUsuario.comprador
 
 
-class UsuarioRespuesta(UsuarioBase):
+class UserResponse(BaseModel):
     id: int
-    rol: RolUsuario
-    fecha_creacion: datetime
+    email: EmailStr
+    role: str
+    created_at: datetime
 
     class Config:
         from_attributes = True
