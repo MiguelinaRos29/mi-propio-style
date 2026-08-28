@@ -2,15 +2,14 @@ import os
 
 from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
 
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
-AUTH_LOGIN_URL = os.getenv("AUTH_LOGIN_URL", "http://127.0.0.1:8002/login")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=AUTH_LOGIN_URL)
+security = HTTPBearer()
 
 
 class UsuarioActual:
@@ -19,12 +18,15 @@ class UsuarioActual:
         self.rol = rol
 
 
-def obtener_usuario_actual(token: str = Depends(oauth2_scheme)) -> UsuarioActual:
+def obtener_usuario_actual(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> UsuarioActual:
     credenciales_invalidas = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="No se pudo validar el token",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    token = credentials.credentials
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         usuario_id = payload.get("sub")
