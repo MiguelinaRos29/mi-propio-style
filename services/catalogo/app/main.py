@@ -261,3 +261,74 @@ def eliminar_wishlist(
     db.delete(item)
     db.commit()
     return {"mensaje": f"Elemento {wishlist_id} eliminado de la wishlist"}
+
+# ---------- Reseñas ----------
+
+def _verificar_propietario_resena(resena: models.Resena, usuario: UsuarioActual):
+    if usuario.rol != "admin" and resena.usuario_id != usuario.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No tienes permiso sobre esta reseña")
+
+
+@app.get("/productos/{producto_id}/resenas", response_model=List[schemas.ResenaRespuesta])
+def listar_resenas(
+    producto_id: int,
+    skip: int = 0,
+    limit: int = 20,
+    db: Session = Depends(get_db),
+):
+    return (
+        db.query(models.Resena)
+        .filter(models.Resena.producto_id == producto_id)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+
+@app.post("/resenas", response_model=schemas.ResenaRespuesta, status_code=status.HTTP_201_CREATED)
+def crear_resena(
+    resena: schemas.ResenaCrear,
+    db: Session = Depends(get_db),
+    usuario: UsuarioActual = Depends(obtener_usuario_actual),
+):
+    producto = db.query(models.Producto).filter(models.Producto.id == resena.producto_id).first()
+    if not producto:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado")
+    nueva_resena = models.Resena(**resena.dict(), usuario_id=usuario.id)
+    db.add(nueva_resena)
+    db.commit()
+    db.refresh(nueva_resena)
+    return nueva_resena
+
+
+@app.put("/resenas/{resena_id}", response_model=schemas.ResenaRespuesta)
+def actualizar_resena(
+    resena_id: int,
+    datos: schemas.ResenaBase,
+    db: Session = Depends(get_db),
+    usuario: UsuarioActual = Depends(obtener_usuario_actual),
+):
+    resena = db.query(models.Resena).filter(models.Resena.id == resena_id).first()
+    if not resena:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reseña no encontrada")
+    _verificar_propietario_resena(resena, usuario)
+    for campo, valor in datos.dict().items():
+        setattr(resena, campo, valor)
+    db.commit()
+    db.refresh(resena)
+    return resena
+
+
+@app.delete("/resenas/{resena_id}")
+def eliminar_resena(
+    resena_id: int,
+    db: Session = Depends(get_db),
+    usuario: UsuarioActual = Depends(obtener_usuario_actual),
+):
+    resena = db.query(models.Resena).filter(models.Resena.id == resena_id).first()
+    if not resena:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reseña no encontrada")
+    _verificar_propietario_resena(resena, usuario)
+    db.delete(resena)
+    db.commit()
+    return {"mensaje": f"Reseña {resena_id} eliminada"}
