@@ -146,3 +146,12 @@ vite.config.ts.timestamp-*
 venv/
 __pycache__/
 *.pyc
+
+# auth_ia_referencia_completo
+auth_ia_referencia_completo
+
+#ordenes_auth_ia_referencia.py
+ordenes_auth_ia_referencia.py
+
+# Configuración local de Claude Code
+.claude/
