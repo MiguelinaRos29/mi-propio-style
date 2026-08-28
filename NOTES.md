@@ -29,3 +29,31 @@ Esta tabla es un resumen legible de ese historial, actualizado a medida que avan
 
 ## Cómo sigo llenando esto
 Cada vez que yo escriba una parte a mano, agrego una fila con fecha, área y una nota corta. Cada vez que la IA escriba o edite algo, la IA agrega su propia fila explicando exactamente qué hizo.
+
+"2026-08-23 — housekeeping: se extrajo referencia de ordenes/app/auth.py y de services/auth/ completo antes de reescribir a mano; originales vaciados, sin pérdida de contenido (recuperable en commit 24a2a2e)" — así el registro queda fiel a lo que realmente pasó, incluida esta parte de reorganización.
+
+## Servicio de Auth terminado 
+Con fecha 26/08/2026
+
+## 28 de agosto de 2026 — Servicio de autenticación completado + control de calidad del repo
+
+**Escrito a mano (100%):**
+- `services/auth/app/database.py` — configuración de engine, SessionLocal y Base con SQLAlchemy
+- `services/auth/app/models.py` — modelo de Usuario
+- `services/auth/app/schemas.py` — esquemas Pydantic de entrada/salida
+- `services/auth/app/security.py` — hashing de contraseñas y generación/verificación de JWT
+- `services/auth/app/auth.py` — endpoints de registro, login y /me
+- `services/auth/app/main.py` — configuración de la app FastAPI
+
+**Decisiones de diseño:**
+- El servicio de auth fue generado originalmente por IA como referencia; se reescribió por completo a mano, línea por línea, para cumplir el requisito del 60% de código original del capstone.
+- El código original de IA se conservó como referencia personal en `services/auth_ia_referencia_completo/`, mapeado a `.gitignore` para que no forme parte del entregable final (no se sabe si la evaluación del 60% será manual o automática, así que se optó por excluirlo directamente en vez de confiar en que no cuente).
+- Mismo criterio aplicado a `services/ordenes/app/ordenes_auth_ia_referencia.py`, referencia para cuando le toque su turno al servicio de órdenes.
+
+**Control de calidad del repositorio (mismo día):**
+- Corregidos errores de tipeo en `.gitignore` que impedían que los archivos de referencia de IA se ignoraran correctamente (guion medio en vez de guion bajo, y nombre de archivo incompleto).
+- Removidos del tracking de Git los `.pyc` de `__pycache__` en `services/catalogo/app/` que se habían comiteado antes de existir la regla en `.gitignore`.
+- Agregada `.claude/` al `.gitignore` (configuración local de la herramienta, no parte del proyecto).
+- Verificado que `services/ordenes/app/auth.py` sigue vacío como corresponde (el código de verificación JWT que había ahí por error permanece recuperable en el historial de Git para cuando se implemente esa parte).
+
+**Siguiente paso:** servicio de catálogo (modelos de productos, CRUD, filtros).
