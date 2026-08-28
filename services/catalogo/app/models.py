@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Text, Numeric, DateTime, ForeignKey, Boolean
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from .database import Base
 
@@ -15,32 +16,44 @@ class Producto(Base):
     categoria = Column(String(100))
     imagen_url = Column(Text)
     stock = Column(Integer, default=0)
-    fecha_creacion = Column(DateTime(timezone=True),
-server_default=func.now())                            
-    
+    fecha_creacion = Column(DateTime(timezone=True), server_default=func.now())
+
+    tallas = relationship("Talla", back_populates="producto", cascade="all, delete-orphan")
+    wishlist_items = relationship("Wishlist", back_populates="producto", cascade="all, delete-orphan")
+    resenas = relationship("Resena", back_populates="producto", cascade="all, delete-orphan")
+
+
 class Talla(Base):
     __tablename__ = "tallas"
-        
+
     id = Column(Integer, primary_key=True, index=True)
-    producto_id = Column(Integer,
-ForeignKey("productos.id"), nullable=False)
+    producto_id = Column(Integer, ForeignKey("productos.id"), nullable=False)
     talla = Column(String(10), nullable=False)
-    stock_talla = Column(Integer, default=0)  
-    
+    stock_talla = Column(Integer, default=0)
+
+    producto = relationship("Producto", back_populates="tallas")
+
+
 class Wishlist(Base):
-    __tablename__ = "wishlist"                         
-    
-    id = Column(Integer, primary_key=True, index=True)                      
-    usuario_id = Column(Integer, nullable=False) 
+    __tablename__ = "wishlist"
+
+    id = Column(Integer, primary_key=True, index=True)
+    usuario_id = Column(Integer, nullable=False)
     producto_id = Column(Integer, ForeignKey("productos.id"), nullable=False)
     fecha_agregado = Column(DateTime(timezone=True), server_default=func.now())
-    notificado = Column(Boolean, default=False)                    
-    
-class Resena(Base):    
+    notificado = Column(Boolean, default=False)
+
+    producto = relationship("Producto", back_populates="wishlist_items")
+
+
+class Resena(Base):
     __tablename__ = "resenas"
+
     id = Column(Integer, primary_key=True, index=True)
     producto_id = Column(Integer, ForeignKey("productos.id"), nullable=False)
     usuario_id = Column(Integer, nullable=False)
     calificacion = Column(Integer, nullable=False)
     comentario = Column(Text)
     fecha = Column(DateTime(timezone=True), server_default=func.now())
+
+    producto = relationship("Producto", back_populates="resenas")
