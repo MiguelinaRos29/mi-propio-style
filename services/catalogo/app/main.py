@@ -110,3 +110,80 @@ def eliminar_producto(
     db.delete(producto)
     db.commit()
     return {"mensaje": f"Producto {producto_id} eliminado"}
+
+# ---------- Tallas ----------
+
+@app.get("/productos/{producto_id}/tallas", response_model=List[schemas.TallaRespuesta])
+def listar_tallas(
+    producto_id: int,
+    skip: int = 0,
+    limit: int = 20,
+    db: Session = Depends(get_db),
+):
+    return (
+        db.query(models.Talla)
+        .filter(models.Talla.producto_id == producto_id)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+
+@app.get("/tallas/{talla_id}", response_model=schemas.TallaRespuesta)
+def obtener_talla(talla_id: int, db: Session = Depends(get_db)):
+    talla = db.query(models.Talla).filter(models.Talla.id == talla_id).first()
+    if not talla:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Talla no encontrada")
+    return talla
+
+
+@app.post("/tallas", response_model=schemas.TallaRespuesta, status_code=status.HTTP_201_CREATED)
+def crear_talla(
+    talla: schemas.TallaCrear,
+    db: Session = Depends(get_db),
+    usuario: UsuarioActual = Depends(requerir_rol("vendedor", "admin")),
+):
+    producto = db.query(models.Producto).filter(models.Producto.id == talla.producto_id).first()
+    if not producto:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado")
+    _verificar_propietario_producto(producto, usuario)
+    nueva_talla = models.Talla(**talla.dict())
+    db.add(nueva_talla)
+    db.commit()
+    db.refresh(nueva_talla)
+    return nueva_talla
+
+
+@app.put("/tallas/{talla_id}", response_model=schemas.TallaRespuesta)
+def actualizar_talla(
+    talla_id: int,
+    datos: schemas.TallaBase,
+    db: Session = Depends(get_db),
+    usuario: UsuarioActual = Depends(obtener_usuario_actual),
+):
+    talla = db.query(models.Talla).filter(models.Talla.id == talla_id).first()
+    if not talla:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Talla no encontrada")
+    producto = db.query(models.Producto).filter(models.Producto.id == talla.producto_id).first()
+    _verificar_propietario_producto(producto, usuario)
+    for campo, valor in datos.dict().items():
+        setattr(talla, campo, valor)
+    db.commit()
+    db.refresh(talla)
+    return talla
+
+
+@app.delete("/tallas/{talla_id}")
+def eliminar_talla(
+    talla_id: int,
+    db: Session = Depends(get_db),
+    usuario: UsuarioActual = Depends(obtener_usuario_actual),
+):
+    talla = db.query(models.Talla).filter(models.Talla.id == talla_id).first()
+    if not talla:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Talla no encontrada")
+    producto = db.query(models.Producto).filter(models.Producto.id == talla.producto_id).first()
+    _verificar_propietario_producto(producto, usuario)
+    db.delete(talla)
+    db.commit()
+    return {"mensaje": f"Talla {talla_id} eliminada"}
