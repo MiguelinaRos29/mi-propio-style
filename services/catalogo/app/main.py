@@ -187,3 +187,77 @@ def eliminar_talla(
     db.delete(talla)
     db.commit()
     return {"mensaje": f"Talla {talla_id} eliminada"}
+
+# ---------- Wishlist ----------
+
+def _verificar_propietario_wishlist(item: models.Wishlist, usuario: UsuarioActual):
+    if usuario.rol != "admin" and item.usuario_id != usuario.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No tienes permiso sobre este elemento")
+
+
+@app.get("/wishlist/{usuario_id}", response_model=List[schemas.WishlistRespuesta])
+def listar_wishlist(
+    usuario_id: int,
+    skip: int = 0,
+    limit: int = 20,
+    db: Session = Depends(get_db),
+    usuario: UsuarioActual = Depends(obtener_usuario_actual),
+):
+    if usuario.rol != "admin" and usuario_id != usuario.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No tienes permiso sobre esta wishlist")
+    return (
+        db.query(models.Wishlist)
+        .filter(models.Wishlist.usuario_id == usuario_id)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+
+@app.post("/wishlist", response_model=schemas.WishlistRespuesta, status_code=status.HTTP_201_CREATED)
+def crear_wishlist(
+    item: schemas.WishlistCrear,
+    db: Session = Depends(get_db),
+    usuario: UsuarioActual = Depends(obtener_usuario_actual),
+):
+    producto = db.query(models.Producto).filter(models.Producto.id == item.producto_id).first()
+    if not producto:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado")
+    nuevo_item = models.Wishlist(**item.dict(), usuario_id=usuario.id)
+    db.add(nuevo_item)
+    db.commit()
+    db.refresh(nuevo_item)
+    return nuevo_item
+
+
+@app.put("/wishlist/{wishlist_id}", response_model=schemas.WishlistRespuesta)
+def actualizar_wishlist(
+    wishlist_id: int,
+    datos: schemas.WishlistBase,
+    db: Session = Depends(get_db),
+    usuario: UsuarioActual = Depends(obtener_usuario_actual),
+):
+    item = db.query(models.Wishlist).filter(models.Wishlist.id == wishlist_id).first()
+    if not item:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Elemento de wishlist no encontrado")
+    _verificar_propietario_wishlist(item, usuario)
+    for campo, valor in datos.dict().items():
+        setattr(item, campo, valor)
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+@app.delete("/wishlist/{wishlist_id}")
+def eliminar_wishlist(
+    wishlist_id: int,
+    db: Session = Depends(get_db),
+    usuario: UsuarioActual = Depends(obtener_usuario_actual),
+):
+    item = db.query(models.Wishlist).filter(models.Wishlist.id == wishlist_id).first()
+    if not item:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Elemento de wishlist no encontrado")
+    _verificar_propietario_wishlist(item, usuario)
+    db.delete(item)
+    db.commit()
+    return {"mensaje": f"Elemento {wishlist_id} eliminado de la wishlist"}
