@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
+
 class ProductoBase(BaseModel):
     nombre: str
     descripcion: Optional[str] = None
@@ -43,7 +44,7 @@ class TallaRespuesta(TallaBase):
 
 
 class WishlistBase(BaseModel):
-    notificado: Optional[bool] = False
+    pass
 
 
 class WishlistCrear(WishlistBase):
@@ -55,6 +56,7 @@ class WishlistRespuesta(WishlistBase):
     usuario_id: int
     producto_id: int
     fecha_agregado: datetime
+    notificado: bool = False
 
     class Config:
         from_attributes = True
@@ -77,4 +79,3 @@ class ResenaRespuesta(ResenaBase):
 
     class Config:
         from_attributes = True
-
