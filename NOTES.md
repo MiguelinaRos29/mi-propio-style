@@ -57,3 +57,56 @@ Con fecha 26/08/2026
 - Verificado que `services/ordenes/app/auth.py` sigue vacío como corresponde (el código de verificación JWT que había ahí por error permanece recuperable en el historial de Git para cuando se implemente esa parte).
 
 **Siguiente paso:** servicio de catálogo (modelos de productos, CRUD, filtros).
+
+## Catálogo — decisiones de diseño
+
+- **Filtros y paginación**: todos los listados (`/productos`) soportan
+  `categoria`, `talla`, `precio_min`, `precio_max`, `buscar` (ilike sobre
+  nombre) y paginación `skip`/`limit`. El filtro por talla usa `.join()`
+  contra la tabla Talla.
+- **Cascade**: `Producto` tiene `cascade="all, delete-orphan"` hacia Talla,
+  Wishlist y Resena — al borrar un producto se limpian sus relaciones.
+- **Validación de reseñas**: `calificacion` usa `Field(ge=1, le=5)` en el
+  schema para acotar el rango sin depender de lógica manual.
+- **Autorización por propietario**: patrón `_verificar_propietario_X`
+  repetido en Producto, Wishlist y Resena — compara `usuario.rol == "admin"`
+  o `X.usuario_id/vendedor_id == usuario.id`. Repetitivo pero explícito;
+  se consideró abstraerlo en un helper genérico pero se dejó así por
+  claridad para la entrega académica.
+
+## Registro de usuarios: por qué /register no acepta `role`
+
+`UserCreate` (servicio auth) solo expone `email` y `password`. Se decidió
+NO permitir que el cliente auto-asigne `role` en el registro público, porque
+eso permitiría que cualquiera se registre como `admin` o `vendedor` sin
+control. En producción esto se resolvería con una invitación explícita o
+un flujo de promoción de rol restringido a un admin ya autenticado.
+
+Para pruebas de desarrollo, los usuarios con rol `vendedor`/`admin` se crean
+registrándose normal (rol por defecto `user`) y luego actualizando el campo
+`role` directamente en la base de datos (Supabase). No es un mecanismo para
+producción, es un atajo documentado para QA manual durante el desarrollo.
+
+## Autenticación entre servicios (auth → catálogo)
+
+Auth emite JWTs (`crear_access_token`, payload con `sub`=id de usuario como
+string y `rol`) y expone `/login`. Catálogo es un servicio distinto que
+únicamente **valida** esos tokens — no los emite ni tiene su propio login.
+
+Primer intento: catálogo usaba `OAuth2PasswordBearer(tokenUrl=AUTH_LOGIN_URL)`
+apuntando al `/login` de auth. Esto rompía Swagger UI de catálogo: el botón
+Authorize mostraba un formulario de usuario/contraseña e intentaba hacer un
+POST real a auth desde el navegador (fetch cross-origin desde el puerto 8000
+hacia el 8002), lo cual el navegador bloqueaba por CORS.
+
+Fix: cambiar el esquema a `HTTPBearer` en `catalogo/app/auth.py`. Este
+esquema no intenta loguear a nadie — simplemente espera recibir un token ya
+emitido en el header `Authorization: Bearer <token>`. Swagger UI ahora
+muestra un campo simple para pegar el token directamente. La lógica de
+`jwt.decode()` y extracción de `sub`/`rol` no cambió; solo el mecanismo de
+extracción del token cambió de `Depends(oauth2_scheme)` a
+`Depends(HTTPBearer())` + `credentials.credentials`.
+
+Lección general: cuando un servicio A emite tokens y un servicio B solo los
+valida, B debe usar HTTPBearer, no OAuth2PasswordBearer — este último asume
+que el propio servicio maneja el flujo de login.
