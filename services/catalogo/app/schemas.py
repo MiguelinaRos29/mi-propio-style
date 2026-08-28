@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 
@@ -63,7 +63,7 @@ class WishlistRespuesta(WishlistBase):
 
 
 class ResenaBase(BaseModel):
-    calificacion: int
+    calificacion: int = Field(ge=1, le=5)
     comentario: Optional[str] = None
 
 
