@@ -43,6 +43,10 @@ class TallaRespuesta(TallaBase):
         from_attributes = True
 
 
+class DescontarStock(BaseModel):
+    cantidad: int
+
+
 class WishlistBase(BaseModel):
     pass
 
