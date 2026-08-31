@@ -1,0 +1,13 @@
+fix(catalogo): reemplazar OAuth2PasswordBearer por HTTPBearer en auth.py
+
+El esquema OAuth2PasswordBearer con tokenUrl apuntando al servicio auth
+(puerto 8002) hacia que Swagger UI de catalogo intentara loguearse por su
+cuenta via fetch cross-origin, lo cual fallaba (Failed to fetch) por CORS.
+
+Catalogo solo valida tokens emitidos por auth, no los emite - el esquema
+correcto para ese rol es HTTPBearer, que espera un token ya emitido y no
+intenta hacer login. La logica de decode (jwt.decode, extraccion de sub/rol)
+no cambio, solo el mecanismo de extraccion del token del header.
+
+Probado end-to-end: registro (auth) -> login (auth) -> token pegado en
+Authorize (catalogo) -> POST /productos autorizado correctamente (201).
