@@ -110,3 +110,26 @@ extracción del token cambió de `Depends(oauth2_scheme)` a
 Lección general: cuando un servicio A emite tokens y un servicio B solo los
 valida, B debe usar HTTPBearer, no OAuth2PasswordBearer — este último asume
 que el propio servicio maneja el flujo de login.
+
+## Catálogo — pruebas end-to-end completadas 31/08/2026
+
+**POST /tallas**: creación de talla exitosa con autenticación HTTPBearer y
+verificación de propietario (`_verificar_propietario_producto`). Detalle
+encontrado: el body de prueba usó `"stock": 10`, pero el schema real del
+campo es `stock_talla` — Pydantic ignoró el campo no reconocido y la talla
+quedó creada con `stock_talla: 0`. No es un bug, fue un nombre de campo
+incorrecto en la prueba manual; documentado como recordatorio de revisar
+siempre el schema antes de armar el body a mano.
+
+**GET /productos?talla=X**: confirmado que el filtro usa `.join(models.Talla)`
+contra la base de datos real, no un mock. Nota importante: la comparación
+es exacta y sensible a mayúsculas/minúsculas (`talla=m` no encontró nada,
+`talla=M` sí) — a diferencia del filtro `buscar`, que usa `ilike` insensible
+a mayúsculas. Es una decisión de diseño pendiente de revisar: dejar `talla`
+como comparación exacta (razonable si el set de valores está controlado:
+S/M/L/XL) o normalizar a mayúsculas antes de comparar, para tolerancia de
+input del usuario. Por ahora se deja como está — documentado como posible
+mejora futura, no bloqueante para la entrega.
+
+Con estas dos pruebas, el ciclo de validación de catálogo (CRUD + relaciones
++ filtros + autenticación cross-servicio) queda cerrado.
