@@ -1,4 +1,6 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+import os
+
+from fastapi import FastAPI, Depends, HTTPException, status, Header
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -22,6 +24,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+SERVICE_KEY = os.getenv("SERVICE_KEY")
+
+
+def verificar_service_key(x_service_key: str = Header(...)):
+    if x_service_key != SERVICE_KEY:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Clave de servicio inválida")
 
 
 # ---------- Productos ----------
@@ -187,6 +196,24 @@ def eliminar_talla(
     db.delete(talla)
     db.commit()
     return {"mensaje": f"Talla {talla_id} eliminada"}
+
+
+@app.patch("/tallas/{talla_id}/descontar-stock", response_model=schemas.TallaRespuesta)
+def descontar_stock(
+    talla_id: int,
+    datos: schemas.DescontarStock,
+    db: Session = Depends(get_db),
+    _: None = Depends(verificar_service_key),
+):
+    talla = db.query(models.Talla).filter(models.Talla.id == talla_id).first()
+    if not talla:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Talla no encontrada")
+    if talla.stock_talla < datos.cantidad:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Stock insuficiente")
+    talla.stock_talla -= datos.cantidad
+    db.commit()
+    db.refresh(talla)
+    return talla
 
 # ---------- Wishlist ----------
 
