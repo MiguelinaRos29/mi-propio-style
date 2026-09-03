@@ -133,3 +133,71 @@ mejora futura, no bloqueante para la entrega.
 
 Con estas dos pruebas, el ciclo de validación de catálogo (CRUD + relaciones
 + filtros + autenticación cross-servicio) queda cerrado.
+
+## Órdenes — pago simulado y autenticación entre servicios (service key)
+
+**Problema a resolver:** el flujo de pago necesita que órdenes descuente
+stock en catálogo cuando un pago es exitoso. El endpoint existente de
+catálogo (`PUT /tallas`) exige ser el vendedor dueño del producto — pero
+quien paga es el comprador, no el vendedor. No se puede reusar ese endpoint
+tal cual sin romper la autorización por propietario ya implementada.
+
+**Solución: patrón de clave de servicio interna.** Se separó la
+autenticación de usuario final (JWT, para humanos) de la autenticación
+entre servicios (una `SERVICE_KEY` compartida, para llamadas
+máquina-a-máquina). Catálogo expone un endpoint nuevo,
+`PATCH /tallas/{id}/descontar-stock`, protegido por una dependencia
+`verificar_service_key` que solo acepta el header `X-Service-Key` con el
+valor correcto — no un JWT de usuario. Órdenes guarda la misma
+`SERVICE_KEY` en su propio `.env` y la envía en ese header al llamar a
+catálogo. Así, órdenes puede descontar stock en nombre del comprador sin
+necesitar ni falsear los permisos de vendedor.
+
+**Diseño del endpoint `POST /ordenes/{id}/pagar`:**
+1. Revalida el stock disponible en tiempo real contra catálogo (no confía
+   en el stock que había al momento de crear la orden).
+2. Simula el cobro con `procesar_pago_simulado()` (`services/ordenes/app/pagos.py`) —
+   función aislada con probabilidad de éxito configurable vía la variable
+   de entorno `PAGO_PROBABILIDAD_EXITO`, pensada para ser reemplazable por
+   un gateway real (Stripe/PayPal) sin tocar el resto del flujo.
+3. Solo si el pago simulado es exitoso, descuenta el stock real en catálogo
+   (vía el endpoint interno con `SERVICE_KEY`).
+4. Solo después de que el descuento de stock se confirma, cambia el estado
+   de la orden a `pagado`.
+
+`PUT /estado` se bloqueó para uso manual del estado `pagado` — nadie puede
+saltarse el flujo de pago y marcar una orden como pagada directamente.
+
+Todas las llamadas HTTP de órdenes hacia catálogo tienen `timeout=5` y
+manejo de `RequestException`, para que un catálogo caído no cuelgue el
+servicio de órdenes indefinidamente.
+
+**Pruebas end-to-end completadas (03/09/2026):**
+- **Camino de éxito** (sesión previa): orden creada → pago exitoso → estado
+  `pagado` confirmado → stock descontado correctamente en catálogo
+  (verificado con `GET /tallas/3`, pasó de 10 a 9).
+- **Camino de fallo** (`PAGO_PROBABILIDAD_EXITO=0`): orden creada (id 4) →
+  intento de pago → `402 Payment Required` → orden confirmada en estado
+  `pendiente` (no cambió) → stock confirmado en 9 (no se descontó).
+
+**Bug real encontrado durante la prueba de fallo (no de lógica, de
+configuración):** `CATALOGO_URL` en `services/ordenes/.env` apuntaba al
+puerto de auth (`8000`) en vez del de catálogo (`8002`). Esto hacía que la
+verificación de producto en `POST /ordenes` fallara con
+`400: Producto no encontrado en catálogo` — un mensaje engañoso, porque el
+producto sí existía; el problema era que la request nunca llegaba al
+servicio correcto. Corregido el valor a `8002` y reiniciado el servidor de
+órdenes (uvicorn con `--reload` no relee variables de entorno, solo
+cambios de código). Lección: un error "no encontrado" en un servicio que
+depende de otro puede ser un problema de red/configuración disfrazado de
+dato faltante — vale la pena confirmar conectividad antes de asumir que el
+dato no existe.
+
+**Limitación de consistencia conocida (documentada, no resuelta):** si una
+orden tiene múltiples items y el descuento de stock falla a mitad de camino
+(por ejemplo, catálogo se cae después de descontar el primer item pero
+antes del segundo), la orden queda marcada como cobrada pero con el stock
+parcialmente descontado. Resolver esto de raíz requeriría un patrón de
+transacciones distribuidas (saga, dos fases, etc.), que está fuera del
+alcance razonable de este capstone. Se documenta como limitación conocida
+y trade-off consciente, no como bug pendiente de arreglar.
