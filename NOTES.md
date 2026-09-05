@@ -201,3 +201,82 @@ parcialmente descontado. Resolver esto de raíz requeriría un patrón de
 transacciones distribuidas (saga, dos fases, etc.), que está fuera del
 alcance razonable de este capstone. Se documenta como limitación conocida
 y trade-off consciente, no como bug pendiente de arreglar.
+
+## Wishlist — CRUD completado y probado (03-05/09/2026)
+
+El modelo `Wishlist` y su CRUD básico ya existían en `services/catalogo/app/main.py`
+de una sesión anterior, sin documentar formalmente. Se revisó, se corrigieron dos
+detalles y se probó end-to-end.
+
+**Cambios aplicados:**
+- **Validación de duplicados** en `POST /wishlist`: antes, un usuario podía agregar
+  el mismo `producto_id` a su wishlist múltiples veces sin restricción, generando
+  filas repetidas. Se agregó una consulta previa que verifica si ya existe una fila
+  con el mismo `usuario_id` + `producto_id`, devolviendo `400 Bad Request` con el
+  mensaje "Este producto ya está en tu wishlist" en caso de duplicado.
+- **Eliminado `PUT /wishlist/{wishlist_id}`**: el schema `WishlistBase` está vacío
+  (sin campos propios), por lo que ese endpoint no actualizaba nada realmente —
+  aceptaba la request pero el `for campo, valor in datos.dict().items()` nunca
+  iteraba. Código muerto sin bugs, pero sin propósito. Además, conceptualmente no
+  tiene sentido "editar" un item de wishlist (solo agregar o quitar), así que se
+  eliminó en vez de intentar darle uso.
+
+**Pruebas end-to-end (05/09/2026):** `POST /wishlist` exitoso (201) → mismo `POST`
+repetido con el mismo producto (400, mensaje correcto) → `GET /wishlist/{usuario_id}`
+lista ambos items existentes → `DELETE /wishlist/{wishlist_id}` elimina correctamente
+(200).
+
+## Función autoaprendida: notificación por email de bajada de precio (05/09/2026)
+
+**Tecnología nueva aprendida:** APScheduler (Advanced Python Scheduler) — librería
+para ejecutar funciones periódicas dentro del mismo proceso de una app FastAPI, sin
+depender de un cron externo del sistema operativo.
+
+**Proveedor de email:** Resend, elegido por API simple (una sola llamada HTTP, SDK
+minimalista) y por permitir pruebas sin verificación de dominio propio (envíos
+limitados a la dirección de registro en el plan gratuito, suficiente para el
+capstone).
+
+**Arquitectura de la solución:**
+
+1. **Detección automática de bajada de precio** (`PUT /productos/{id}`, servicio de
+   catálogo): antes de sobrescribir los datos del producto, se compara el `precio`
+   nuevo contra el `precio` actual en base de datos. Si el nuevo es menor, el
+   backend actualiza `precio_anterior` automáticamente con el valor viejo — el
+   vendedor ya no necesita (ni puede) mandar ese campo a mano; se excluye
+   explícitamente del body con `datos.dict(exclude={"precio_anterior"})`. También
+   se resetea `notificado: False` en todos los items de wishlist de ese producto,
+   para que una bajada nueva dispare una notificación nueva aunque ya se hubiera
+   avisado de una bajada anterior.
+
+2. **Job periódico con APScheduler** (`services/catalogo/app/scheduler.py`):
+   arranca y se detiene junto con el ciclo de vida de la app FastAPI, usando el
+   patrón `lifespan` (`@asynccontextmanager`) en vez de los antiguos eventos
+   `@app.on_event("startup")`/`"shutdown"` (deprecados). Cada 15 minutos, el job
+   consulta la tabla `Wishlist` uniéndola con `Producto`, filtrando por
+   `notificado == False` y `precio < precio_anterior`. Por cada coincidencia,
+   envía el email y marca `notificado = True`.
+
+3. **Envío de email** (`services/catalogo/app/emails.py`): función aislada
+   `enviar_notificacion_bajada_precio()`, mismo patrón de aislamiento que
+   `pagos.py` en órdenes — encapsula la llamada al SDK de Resend en una sola
+   función fácil de probar y de reemplazar a futuro.
+
+**Pruebas end-to-end (05/09/2026):** se bajó el precio del producto "Camiseta
+básica" en tres ocasiones distintas vía `PUT /productos/1` (24.99→19.99,
+19.99→14.99, 14.99→9.99). Las tres bajadas generaron su email correspondiente,
+recibido en la bandeja de prueba, cada uno con el precio anterior y nuevo
+correctos. Confirmado que `precio_anterior` se calcula solo en cada caso, sin
+intervención manual.
+
+**Decisión de intervalo:** se probó con `minutes=2` para no esperar de más durante
+el desarrollo, y se subió a `minutes=15` para el estado final del proyecto — un
+valor razonable entre "el usuario se entera a tiempo" y "no sobrecargar la base de
+datos ni la cuota de envíos de Resend".
+
+**Detalle técnico encontrado:** el logging estándar de Python (`logging.info(...)`)
+no muestra nada en consola por defecto si no se llama a `logging.basicConfig()`
+antes de que cualquier otro módulo importado configure el logging primero. Se
+agregó `logging.basicConfig(level=logging.INFO)` como la primera línea de
+`main.py` (antes de cualquier otro import) para garantizar que se ejecute primero
+y los logs del scheduler sean visibles en consola.

@@ -1,4 +1,8 @@
+import logging
+logging.basicConfig(level=logging.INFO)
+
 import os
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Depends, HTTPException, status, Header
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,10 +11,19 @@ from typing import List, Optional
 from . import models, schemas
 from .auth import UsuarioActual, obtener_usuario_actual, requerir_rol
 from .database import engine, SessionLocal, Base, get_db
+from .scheduler import iniciar_scheduler, detener_scheduler
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    iniciar_scheduler()
+    yield
+    detener_scheduler()
+
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -99,8 +112,19 @@ def actualizar_producto(
     if not producto:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado")
     _verificar_propietario_producto(producto, usuario)
-    for campo, valor in datos.dict().items():
+
+    precio_viejo = producto.precio
+
+    datos_dict = datos.dict(exclude={"precio_anterior"})
+    for campo, valor in datos_dict.items():
         setattr(producto, campo, valor)
+
+    if producto.precio < precio_viejo:
+        producto.precio_anterior = precio_viejo
+        db.query(models.Wishlist).filter(
+            models.Wishlist.producto_id == producto_id
+        ).update({"notificado": False})
+
     db.commit()
     db.refresh(producto)
     return producto
@@ -250,29 +274,23 @@ def crear_wishlist(
     producto = db.query(models.Producto).filter(models.Producto.id == item.producto_id).first()
     if not producto:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado")
+
+    existente = (
+        db.query(models.Wishlist)
+        .filter(
+            models.Wishlist.usuario_id == usuario.id,
+            models.Wishlist.producto_id == item.producto_id,
+        )
+        .first()
+    )
+    if existente:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Este producto ya está en tu wishlist")
+
     nuevo_item = models.Wishlist(**item.dict(), usuario_id=usuario.id)
     db.add(nuevo_item)
     db.commit()
     db.refresh(nuevo_item)
     return nuevo_item
-
-
-@app.put("/wishlist/{wishlist_id}", response_model=schemas.WishlistRespuesta)
-def actualizar_wishlist(
-    wishlist_id: int,
-    datos: schemas.WishlistBase,
-    db: Session = Depends(get_db),
-    usuario: UsuarioActual = Depends(obtener_usuario_actual),
-):
-    item = db.query(models.Wishlist).filter(models.Wishlist.id == wishlist_id).first()
-    if not item:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Elemento de wishlist no encontrado")
-    _verificar_propietario_wishlist(item, usuario)
-    for campo, valor in datos.dict().items():
-        setattr(item, campo, valor)
-    db.commit()
-    db.refresh(item)
-    return item
 
 
 @app.delete("/wishlist/{wishlist_id}")
