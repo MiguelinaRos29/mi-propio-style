@@ -1,0 +1,87 @@
+@use '../../styles/variables' as *;
+
+.authContenedor {
+  display: flex;
+  justify-content: center;
+  padding: 4rem 1.5rem;
+}
+
+.authForm {
+  background-color: $color-blanco;
+  border: 1px solid rgba($color-cafe, 0.1);
+  border-radius: 8px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  h1 {
+    font-family: $font-heading;
+    color: $color-cafe;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.9rem;
+    color: $color-cafe-light;
+  }
+
+  input {
+    padding: 0.65rem 0.75rem;
+    border: 1px solid rgba($color-cafe, 0.2);
+    border-radius: 4px;
+    font-size: 1rem;
+
+    &:focus {
+      outline: none;
+      border-color: $color-terracota;
+    }
+  }
+
+  button {
+    margin-top: 0.5rem;
+    background-color: $color-terracota;
+    color: $color-blanco;
+    border: none;
+    border-radius: 4px;
+    padding: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background-color: $color-terracota-dark;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.error {
+  background-color: rgba(#c0392b, 0.1);
+  color: #c0392b;
+  padding: 0.6rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.enlace {
+  text-align: center;
+  font-size: 0.85rem;
+  color: $color-cafe-light;
+
+  a {
+    color: $color-terracota;
+    font-weight: 600;
+    text-decoration: none;
+  }
+}

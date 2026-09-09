@@ -1,0 +1,29 @@
+@use '../../styles/variables' as *;
+
+.perfil {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+
+  h1 {
+    font-family: $font-heading;
+    color: $color-cafe;
+    margin-bottom: 1rem;
+  }
+}
+
+.botonSalir {
+  margin-top: 1.5rem;
+  background: none;
+  border: 1px solid $color-terracota;
+  color: $color-terracota;
+  padding: 0.6rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+
+  &:hover {
+    background-color: $color-terracota;
+    color: $color-blanco;
+  }
+}

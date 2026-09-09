@@ -280,3 +280,9 @@ antes de que cualquier otro módulo importado configure el logging primero. Se
 agregó `logging.basicConfig(level=logging.INFO)` como la primera línea de
 `main.py` (antes de cualquier otro import) para garantizar que se ejecute primero
 y los logs del scheduler sean visibles en consola.
+
+## [9/9/2026]
+- Frontend: Layout base, Navbar, Footer y rutas (Home, Catálogo placeholder, Wishlist placeholder) escritos a mano y probados.
+- Frontend: Auth completo (Login, Register, AuthContext, ProtectedRoute, página Perfil) escrito a mano y probado end-to-end.
+- Backend: agregado CORSMiddleware en services/auth para permitir peticiones desde localhost:5173.
+- Fix: /login espera application/x-www-form-urlencoded (OAuth2PasswordRequestForm), no JSON — corregido en authService.js.
