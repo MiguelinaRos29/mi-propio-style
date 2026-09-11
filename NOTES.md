@@ -286,3 +286,10 @@ y los logs del scheduler sean visibles en consola.
 - Frontend: Auth completo (Login, Register, AuthContext, ProtectedRoute, página Perfil) escrito a mano y probado end-to-end.
 - Backend: agregado CORSMiddleware en services/auth para permitir peticiones desde localhost:5173.
 - Fix: /login espera application/x-www-form-urlencoded (OAuth2PasswordRequestForm), no JSON — corregido en authService.js.
+
+## [11/9/2026]
+- Frontend: Vista de detalle de producto (`ProductoDetalle.jsx`) conectada al catálogo — trae producto y tallas en paralelo, tallas sin stock se muestran deshabilitadas.
+- Frontend: Filtro por talla en el listado de catálogo (`Catalogo.jsx`), conectado al query param `talla` del backend; probado con S, M, L, XL.
+- Frontend: Wishlist real conectada (`Wishlist.jsx`) — listar, agregar desde el detalle de producto, y quitar; cada item trae los datos completos del producto vía `obtenerProducto` porque `GET /wishlist/{usuario_id}` solo devuelve `producto_id`.
+- Fix: campo real de stock en tallas es `stock_talla`, no `stock` — corregido en `ProductoDetalle.jsx`.
+- Con esto el frontend queda funcional de punta a punta: Auth, Catálogo (listado + detalle + filtro), Wishlist — todo probado end-to-end contra los 2 microservicios (auth y catálogo) en local.

@@ -1,0 +1,91 @@
+@use '../../styles/variables' as *;
+
+.catalogo {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+
+  h1 {
+    font-family: $font-heading;
+    color: $color-cafe;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.filtros {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+
+  span {
+    color: $color-cafe-light;
+    font-size: 0.9rem;
+    margin-right: 0.3rem;
+  }
+}
+
+.filtroBoton {
+  border: 1px solid rgba($color-cafe, 0.3);
+  background-color: $color-blanco;
+  color: $color-cafe;
+  padding: 0.4rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+
+  &:hover {
+    border-color: $color-terracota;
+  }
+}
+
+.activo {
+  background-color: $color-terracota;
+  border-color: $color-terracota;
+  color: $color-blanco;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background-color: $color-blanco;
+  border: 1px solid rgba($color-cafe, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba($color-cafe, 0.1);
+  }
+
+  h3 {
+    color: $color-cafe;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.precio {
+  color: $color-terracota-dark;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.descripcion {
+  color: $color-cafe-light;
+  font-size: 0.9rem;
+}
+
+.estado {
+  text-align: center;
+  padding: 3rem;
+  color: $color-cafe-light;
+}
