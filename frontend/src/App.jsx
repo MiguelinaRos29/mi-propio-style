@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/layout/Layout';
 import Home from './pages/Home/Home';
 import Catalogo from './pages/Catalogo/Catalogo';
+import ProductoDetalle from './pages/Catalogo/ProductoDetalle';
 import Wishlist from './pages/Wishlist/Wishlist';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
@@ -17,6 +18,7 @@ function App() {
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
             <Route path="/catalogo" element={<Catalogo />} />
+            <Route path="/catalogo/:id" element={<ProductoDetalle />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/login" element={<Login />} />
             <Route path="/registro" element={<Register />} />

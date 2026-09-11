@@ -1,0 +1,75 @@
+@use '../../styles/variables' as *;
+
+.wishlist {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+
+  h1 {
+    font-family: $font-heading;
+    color: $color-cafe;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background-color: $color-blanco;
+  border: 1px solid rgba($color-cafe, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.enlace {
+  text-decoration: none;
+  color: inherit;
+
+  h3 {
+    color: $color-cafe;
+    margin-bottom: 0.4rem;
+  }
+
+  &:hover h3 {
+    color: $color-terracota;
+  }
+}
+
+.precio {
+  color: $color-terracota-dark;
+  font-weight: 600;
+}
+
+.eliminarBoton {
+  align-self: flex-start;
+  background: none;
+  border: 1px solid rgba($color-cafe, 0.3);
+  color: $color-cafe-light;
+  padding: 0.35rem 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+
+  &:hover {
+    border-color: #c0392b;
+    color: #c0392b;
+  }
+}
+
+.estado {
+  text-align: center;
+  padding: 3rem;
+  color: $color-cafe-light;
+
+  a {
+    color: $color-terracota;
+    font-weight: 600;
+  }
+}
