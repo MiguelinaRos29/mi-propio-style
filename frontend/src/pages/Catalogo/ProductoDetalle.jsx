@@ -1,18 +1,24 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { obtenerProducto, listarTallas, agregarAWishlist } from '../../services/catalogoService';
+import { crearOrden, pagarOrden } from '../../services/ordenesService';
 import styles from './ProductoDetalle.module.scss';
 
 const ProductoDetalle = () => {
   const { id } = useParams();
   const { usuario, token } = useAuth();
+  const navigate = useNavigate();
+
   const [producto, setProducto] = useState(null);
   const [tallas, setTallas] = useState([]);
   const [tallaSeleccionada, setTallaSeleccionada] = useState(null);
+  const [cantidad, setCantidad] = useState(1);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
   const [mensajeWishlist, setMensajeWishlist] = useState('');
+  const [comprando, setComprando] = useState(false);
+  const [mensajeCompra, setMensajeCompra] = useState('');
 
   useEffect(() => {
     const cargarDatos = async () => {
@@ -45,9 +51,29 @@ const ProductoDetalle = () => {
     }
   };
 
+  const manejarComprar = async () => {
+    setMensajeCompra('');
+    setComprando(true);
+    try {
+      const orden = await crearOrden(
+        [{ producto_id: Number(id), talla_id: tallaSeleccionada, cantidad }],
+        token
+      );
+      await pagarOrden(orden.id, token);
+      navigate('/mis-ordenes');
+    } catch (err) {
+      setMensajeCompra(err.message);
+    } finally {
+      setComprando(false);
+    }
+  };
+
   if (cargando) return <p className={styles.estado}>Cargando producto...</p>;
   if (error) return <p className={styles.estado}>Error: {error}</p>;
   if (!producto) return null;
+
+  const tallaActual = tallas.find((t) => t.id === tallaSeleccionada);
+  const stockDisponible = tallaActual ? tallaActual.stock_talla : 0;
 
   return (
     <div className={styles.detalle}>
@@ -73,7 +99,11 @@ const ProductoDetalle = () => {
                     tallaSeleccionada === talla.id ? styles.seleccionada : ''
                   }`}
                   disabled={talla.stock_talla === 0}
-                  onClick={() => setTallaSeleccionada(talla.id)}
+                  onClick={() => {
+                    setTallaSeleccionada(talla.id);
+                    setCantidad(1);
+                    setMensajeCompra('');
+                  }}
                 >
                   {talla.talla}
                   {talla.stock_talla === 0 && <span className={styles.sinStock}> (agotado)</span>}
@@ -84,15 +114,45 @@ const ProductoDetalle = () => {
         </div>
 
         {usuario ? (
-          <div className={styles.wishlistAccion}>
-            <button className={styles.wishlistBoton} onClick={manejarAgregarWishlist}>
-              ♡ Agregar a wishlist
-            </button>
-            {mensajeWishlist && <p className={styles.mensajeWishlist}>{mensajeWishlist}</p>}
-          </div>
+          <>
+            {tallaSeleccionada && (
+              <div className={styles.compraAccion}>
+                <label className={styles.cantidadLabel}>
+                  Cantidad
+                  <input
+                    type="number"
+                    min={1}
+                    max={stockDisponible}
+                    value={cantidad}
+                    onChange={(e) =>
+                      setCantidad(Math.max(1, Math.min(stockDisponible, Number(e.target.value))))
+                    }
+                    className={styles.cantidadInput}
+                  />
+                </label>
+
+                <button
+                  className={styles.comprarBoton}
+                  onClick={manejarComprar}
+                  disabled={comprando}
+                >
+                  {comprando ? 'Procesando...' : 'Comprar ahora'}
+                </button>
+
+                {mensajeCompra && <p className={styles.mensajeCompra}>{mensajeCompra}</p>}
+              </div>
+            )}
+
+            <div className={styles.wishlistAccion}>
+              <button className={styles.wishlistBoton} onClick={manejarAgregarWishlist}>
+                ♡ Agregar a wishlist
+              </button>
+              {mensajeWishlist && <p className={styles.mensajeWishlist}>{mensajeWishlist}</p>}
+            </div>
+          </>
         ) : (
           <p className={styles.estado}>
-            <Link to="/login">Inicia sesión</Link> para agregar a tu wishlist.
+            <Link to="/login">Inicia sesión</Link> para comprar o agregar a tu wishlist.
           </p>
         )}
       </div>

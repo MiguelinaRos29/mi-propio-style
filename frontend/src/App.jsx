@@ -9,6 +9,7 @@ import Wishlist from './pages/Wishlist/Wishlist';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import Perfil from './pages/Perfil/Perfil';
+import MisOrdenes from './pages/Perfil/MisOrdenes';
 
 function App() {
   return (
@@ -27,6 +28,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Perfil />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/mis-ordenes"
+              element={
+                <ProtectedRoute>
+                  <MisOrdenes />
                 </ProtectedRoute>
               }
             />
