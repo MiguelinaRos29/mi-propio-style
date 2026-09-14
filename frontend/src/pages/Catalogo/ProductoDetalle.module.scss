@@ -112,3 +112,53 @@
   color: $color-cafe-light;
   font-size: 0.9rem;
 }
+
+.compraAccion {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.cantidadLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: $color-cafe-light;
+}
+
+.cantidadInput {
+  width: 70px;
+  padding: 0.5rem;
+  border: 1px solid rgba($color-cafe, 0.2);
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.comprarBoton {
+  background-color: $color-terracota;
+  color: $color-blanco;
+  border: none;
+  padding: 0.7rem 1.6rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: $color-terracota-dark;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.mensajeCompra {
+  width: 100%;
+  color: #c0392b;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}

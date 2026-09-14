@@ -293,3 +293,10 @@ y los logs del scheduler sean visibles en consola.
 - Frontend: Wishlist real conectada (`Wishlist.jsx`) — listar, agregar desde el detalle de producto, y quitar; cada item trae los datos completos del producto vía `obtenerProducto` porque `GET /wishlist/{usuario_id}` solo devuelve `producto_id`.
 - Fix: campo real de stock en tallas es `stock_talla`, no `stock` — corregido en `ProductoDetalle.jsx`.
 - Con esto el frontend queda funcional de punta a punta: Auth, Catálogo (listado + detalle + filtro), Wishlist — todo probado end-to-end contra los 2 microservicios (auth y catálogo) en local.
+
+## [14/09/2026]
+- Frontend: flujo de compra completo — "Comprar ahora" en detalle de producto (talla + cantidad), crea orden y la paga automáticamente.
+- Frontend: página "Mis Órdenes" (historial con estado: Pendiente/Pagado/Cancelado) conectada al servicio de órdenes.
+- Backend fix: GET /ordenes solo permitía admin (403 para compradores); corregido para que cada usuario vea sus propias órdenes, y admin vea todas.
+- Fix: estado real del backend es "pagado" (no "pagada") — corregido en frontend.
+- Probado end-to-end: compra completa desde catálogo hasta ver la orden pagada en Mis Órdenes.

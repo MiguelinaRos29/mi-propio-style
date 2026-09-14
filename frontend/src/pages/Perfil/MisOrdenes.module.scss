@@ -53,7 +53,7 @@
   font-weight: 600;
 }
 
-.pagada {
+.pagado {
   background-color: rgba(#2e7d32, 0.15);
   color: #2e7d32;
 }
@@ -63,7 +63,7 @@
   color: #8a6d1f;
 }
 
-.cancelada {
+.cancelado {
   background-color: rgba(#c0392b, 0.12);
   color: #c0392b;
 }
@@ -83,16 +83,4 @@
   text-align: center;
   padding: 2rem;
   color: $color-cafe-light;
-}
-
-.enlaceOrdenes {
-  display: block;
-  color: $color-terracota;
-  text-decoration: none;
-  font-weight: 600;
-  margin: 1rem 0 1.5rem;
-
-  &:hover {
-    color: $color-terracota-dark;
-  }
 }

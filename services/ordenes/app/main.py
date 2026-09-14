@@ -36,13 +36,14 @@ def _verificar_propietario_orden(orden: models.Orden, usuario: UsuarioActual):
     if usuario.rol != "admin" and orden.comprador_id != usuario.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No tienes permiso sobre esta orden")
 
-
 @app.get("/ordenes", response_model=List[schemas.OrdenRespuesta])
 def listar_ordenes(
     db: Session = Depends(get_db),
-    usuario: UsuarioActual = Depends(requerir_rol("admin")),
+    usuario: UsuarioActual = Depends(obtener_usuario_actual),
 ):
-    return db.query(models.Orden).all()
+    if usuario.rol == "admin":
+        return db.query(models.Orden).all()
+    return db.query(models.Orden).filter(models.Orden.comprador_id == usuario.id).all()
 
 
 @app.get("/ordenes/{orden_id}", response_model=schemas.OrdenRespuesta)
