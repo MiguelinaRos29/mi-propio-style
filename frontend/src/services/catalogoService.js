@@ -83,3 +83,62 @@ export const eliminarDeWishlist = async (wishlistId, token) => {
     throw new Error(extraerMensajeError(error));
   }
 };
+
+export const listarResenas = async (productoId) => {
+  const respuesta = await fetch(`${BASE_URL}/productos/${productoId}/resenas`);
+
+  if (!respuesta.ok) {
+    const error = await respuesta.json().catch(() => ({}));
+    throw new Error(extraerMensajeError(error));
+  }
+
+  return respuesta.json();
+};
+
+export const crearResena = async (datos, token) => {
+  const respuesta = await fetch(`${BASE_URL}/resenas`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(datos),
+  });
+
+  if (!respuesta.ok) {
+    const error = await respuesta.json().catch(() => ({}));
+    throw new Error(extraerMensajeError(error));
+  }
+
+  return respuesta.json();
+};
+
+export const actualizarResena = async (resenaId, datos, token) => {
+  const respuesta = await fetch(`${BASE_URL}/resenas/${resenaId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(datos),
+  });
+
+  if (!respuesta.ok) {
+    const error = await respuesta.json().catch(() => ({}));
+    throw new Error(extraerMensajeError(error));
+  }
+
+  return respuesta.json();
+};
+
+export const eliminarResena = async (resenaId, token) => {
+  const respuesta = await fetch(`${BASE_URL}/resenas/${resenaId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!respuesta.ok) {
+    const error = await respuesta.json().catch(() => ({}));
+    throw new Error(extraerMensajeError(error));
+  }
+};

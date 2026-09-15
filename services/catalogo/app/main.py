@@ -2,6 +2,8 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 import os
+import httpx
+from dotenv import load_dotenv
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Depends, HTTPException, status, Header
@@ -38,7 +40,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+load_dotenv()
+
 SERVICE_KEY = os.getenv("SERVICE_KEY")
+ORDENES_SERVICE_URL = os.getenv("ORDENES_SERVICE_URL")  # ej: http://localhost:8001
 
 
 def verificar_service_key(x_service_key: str = Header(...)):
@@ -314,6 +319,24 @@ def _verificar_propietario_resena(resena: models.Resena, usuario: UsuarioActual)
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No tienes permiso sobre esta reseña")
 
 
+def _verificar_compra(usuario_id: int, producto_id: int) -> bool:
+    """Llama al microservicio de órdenes para confirmar que el usuario compró este producto."""
+    try:
+        resp = httpx.get(
+            f"{ORDENES_SERVICE_URL}/internal/verificar-compra",
+            params={"usuario_id": usuario_id, "producto_id": producto_id},
+            headers={"X-Service-Key": SERVICE_KEY},
+            timeout=5.0,
+        )
+        resp.raise_for_status()
+        return resp.json().get("compro", False)
+    except httpx.HTTPError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="No se pudo verificar la compra en este momento",
+        )
+
+
 @app.get("/productos/{producto_id}/resenas", response_model=List[schemas.ResenaRespuesta])
 def listar_resenas(
     producto_id: int,
@@ -339,6 +362,13 @@ def crear_resena(
     producto = db.query(models.Producto).filter(models.Producto.id == resena.producto_id).first()
     if not producto:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado")
+
+    if not _verificar_compra(usuario.id, resena.producto_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo quien compró el producto puede dejar una reseña",
+        )
+
     nueva_resena = models.Resena(**resena.dict(), usuario_id=usuario.id)
     db.add(nueva_resena)
     db.commit()

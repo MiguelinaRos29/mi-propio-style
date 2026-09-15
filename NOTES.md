@@ -300,3 +300,25 @@ y los logs del scheduler sean visibles en consola.
 - Backend fix: GET /ordenes solo permitía admin (403 para compradores); corregido para que cada usuario vea sus propias órdenes, y admin vea todas.
 - Fix: estado real del backend es "pagado" (no "pagada") — corregido en frontend.
 - Probado end-to-end: compra completa desde catálogo hasta ver la orden pagada en Mis Órdenes.
+
+## [15/09/2026] Backend de Reseñas completado y probado
+
+- Backend de reseñas (catálogo + órdenes) terminado y probado end-to-end en Swagger:
+  POST/GET/PUT/DELETE /resenas, todos con 200/201/403 según esperado.
+- Bugs corregidos en el camino: modelo Resena duplicado, falta de import datetime,
+  schemas desalineados (fecha vs created_at, faltaba foto_url), falta de load_dotenv()
+  en catálogo (rompía comunicación entre microservicios), columna faltante en Supabase.
+- Frontend de reseñas escrito: sección integrada en ProductoDetalle.jsx,
+  funciones nuevas en catalogoService.js, estilos en ProductoDetalle.module.scss.
+
+## Pendiente / bloqueado
+
+- BUG ACTIVO: login del frontend falla con "Ocurrió un error inesperado".
+  Causa raíz confirmada: BASE_URL llega como `undefined` en authService.js
+  (la petición va a localhost:5173/undefined/login en vez de localhost:8002/login),
+  a pesar de que .env tiene VITE_AUTH_API_URL correcto y vite.config.js está limpio.
+  Sin resolver aún — próximo paso: agregar console.log(import.meta.env) en
+  authService.js para ver qué está recibiendo Vite realmente.
+- Frontend de reseñas escrito pero SIN PROBAR (bloqueado por el bug de login).
+- Roadmap pendiente tras esto: deploy con URLs en vivo, revisión de responsive,
+  revisar keys de Supabase (anon vs service_role) en cada .env.

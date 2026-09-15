@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import Column, Integer, String, Text, Numeric, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -52,8 +54,9 @@ class Resena(Base):
     id = Column(Integer, primary_key=True, index=True)
     producto_id = Column(Integer, ForeignKey("productos.id"), nullable=False)
     usuario_id = Column(Integer, nullable=False)
-    calificacion = Column(Integer, nullable=False)
-    comentario = Column(Text)
-    fecha = Column(DateTime(timezone=True), server_default=func.now())
+    calificacion = Column(Integer, nullable=False)  # 1-5
+    comentario = Column(String, nullable=True)
+    foto_url = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     producto = relationship("Producto", back_populates="resenas")

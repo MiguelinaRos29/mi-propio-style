@@ -69,6 +69,7 @@ class WishlistRespuesta(WishlistBase):
 class ResenaBase(BaseModel):
     calificacion: int = Field(ge=1, le=5)
     comentario: Optional[str] = None
+    foto_url: Optional[str] = None
 
 
 class ResenaCrear(ResenaBase):
@@ -79,7 +80,7 @@ class ResenaRespuesta(ResenaBase):
     id: int
     producto_id: int
     usuario_id: int
-    fecha: datetime
+    created_at: datetime
 
     class Config:
         from_attributes = True
