@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Header
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
@@ -57,6 +57,28 @@ def obtener_orden(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Orden no encontrada")
     _verificar_propietario_orden(orden, usuario)
     return orden
+
+@app.get("/internal/verificar-compra")
+def verificar_compra(
+    usuario_id: int,
+    producto_id: int,
+    x_service_key: str = Header(..., alias="X-Service-Key"),
+    db: Session = Depends(get_db),
+):
+    if x_service_key != SERVICE_KEY:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No autorizado")
+
+    compra = (
+        db.query(models.OrdenItem)
+        .join(models.Orden, models.OrdenItem.orden_id == models.Orden.id)
+        .filter(
+            models.Orden.comprador_id == usuario_id,
+            models.OrdenItem.producto_id == producto_id,
+            models.Orden.estado == "pagado",
+        )
+        .first()
+    )
+    return {"compro": compra is not None}
 
 
 @app.post("/ordenes", response_model=schemas.OrdenRespuesta, status_code=status.HTTP_201_CREATED)

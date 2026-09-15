@@ -162,3 +162,159 @@
   font-size: 0.85rem;
   margin-top: 0.5rem;
 }
+
+// --- Reseñas ---
+
+.resenas {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba($color-cafe, 0.15);
+
+  h3 {
+    color: $color-cafe;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+  }
+}
+
+.resenasLista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.resenaCard {
+  padding: 1rem;
+  border: 1px solid rgba($color-cafe, 0.2);
+  border-radius: 4px;
+  background-color: $color-blanco;
+}
+
+.resenaCabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.resenaCalificacion {
+  color: $color-terracota;
+  font-size: 1.1rem;
+  letter-spacing: 0.1rem;
+}
+
+.resenaFecha {
+  font-size: 0.8rem;
+  color: $color-cafe-light;
+}
+
+.resenaComentario {
+  margin: 0.5rem 0 0;
+  line-height: 1.4;
+  color: $color-cafe;
+}
+
+.resenaAcciones {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.resenaEditarBoton,
+.resenaEliminarBoton {
+  background: none;
+  border: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.resenaEditarBoton {
+  color: $color-cafe-light;
+
+  &:hover {
+    color: $color-terracota;
+  }
+}
+
+.resenaEliminarBoton {
+  color: #c0392b;
+}
+
+// --- Formulario de reseña ---
+
+.resenaForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid rgba($color-cafe, 0.2);
+  border-radius: 4px;
+  max-width: 420px;
+
+  h4 {
+    margin: 0;
+    color: $color-cafe;
+    font-family: $font-heading;
+  }
+}
+
+.resenaLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: $color-cafe-light;
+}
+
+.resenaSelect,
+.resenaTextarea {
+  padding: 0.5rem;
+  border: 1px solid rgba($color-cafe, 0.2);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  color: $color-cafe;
+}
+
+.resenaFormBotones {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.resenaEnviarBoton {
+  background-color: $color-terracota;
+  color: $color-blanco;
+  border: none;
+  padding: 0.7rem 1.6rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: $color-terracota-dark;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.resenaCancelarBoton {
+  background-color: $color-blanco;
+  border: 1px solid rgba($color-cafe, 0.3);
+  color: $color-cafe-light;
+  padding: 0.7rem 1.4rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+
+  &:hover {
+    border-color: $color-terracota;
+    color: $color-terracota;
+  }
+}
