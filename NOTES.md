@@ -322,3 +322,55 @@ y los logs del scheduler sean visibles en consola.
 - Frontend de reseñas escrito pero SIN PROBAR (bloqueado por el bug de login).
 - Roadmap pendiente tras esto: deploy con URLs en vivo, revisión de responsive,
   revisar keys de Supabase (anon vs service_role) en cada .env.
+
+  ## [16/9/2026] Bug del login resuelto + reseñas validadas end-to-end
+
+### Bug resuelto: login con "Ocurrió un error inesperado"
+
+**Causa raíz:** el archivo `frontend/.env` tenía un BOM (Byte Order Mark,
+bytes `EF BB BF`) al inicio del archivo. Esto hacía que Vite no
+reconociera el nombre de la primera variable (`VITE_AUTH_API_URL`) tal
+cual estaba escrito, así que `import.meta.env.VITE_AUTH_API_URL` devolvía
+`undefined`. Esto rompía `BASE_URL` en `authService.js`, y las peticiones
+salían hacia `http://localhost:5173/undefined/login` en vez de
+`http://localhost:8002/login`.
+
+**Cómo se detectó:** con `Format-Hex .env | Select-Object -First 3` en
+PowerShell, que mostró los bytes `EF BB BF` antes del contenido esperado.
+
+**Solución:**
+```powershell
+$content = Get-Content .env -Raw
+[System.IO.File]::WriteAllText("$PWD\.env", $content, [System.Text.UTF8Encoding]::new($false))
+```
+
+**Causa secundaria descubierta en el proceso:** existía un
+`frontend/.env.txt` obsoleto con los puertos de los microservicios
+cruzados/incorrectos, que generaba confusión adicional. Se eliminó.
+
+**Puertos reales confirmados de los microservicios:**
+- auth → 8002
+- catalogo → 8001
+- ordenes → 8000
+
+**Lección aprendida:** al crear/editar `.env` en Windows, verificar que
+el editor no esté guardando con BOM. VS Code puede hacerlo dependiendo
+de cómo se creó el archivo. Si un futuro `.env` "se ve bien" pero Vite
+sigue sin leer la primera variable, revisar el BOM con `Format-Hex`
+antes que nada.
+
+### Frontend de reseñas: probado end-to-end
+
+Con el login ya funcionando, se probó el flujo completo desde la UI
+real en `/catalogo/3` (Vestido floral):
+-  Crear reseña (5 estrellas + comentario)
+-  Restricción "ya dejaste una reseña para este producto" funcionando
+-  Editar reseña existente
+-  Eliminar reseña
+
+Backend y frontend de reseñas quedan validados por completo.
+
+### Pendiente antes de entregar
+- Deploy con URLs en vivo
+- Revisión de responsive
+- Revisar qué key de Supabase usa cada `.env` (anon vs service_role)

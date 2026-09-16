@@ -1,0 +1,12 @@
+fix: corregir BOM en .env del frontend que rompia la variable VITE_AUTH_API_URL
+
+- El archivo frontend/.env tenia un BOM (EF BB BF) al inicio, lo que impedia que Vite reconociera correctamente la primera variable (VITE_AUTH_API_URL), causando que BASE_URL llegara undefined en authService.js y el login fallara con "Ocurrio un error inesperado"
+- Reescrito el .env en UTF-8 sin BOM
+- Eliminado frontend/.env.txt (archivo obsoleto con puertos incorrectos que generaba confusion)
+- Confirmados puertos reales de los microservicios: auth=8002, catalogo=8001, ordenes=8000
+
+feat: frontend de resenas probado end-to-end
+
+- Componente de resenas en ProductoDetalle.jsx validado con los 3 microservicios corriendo
+- Probado crear, listar, editar y eliminar resena desde la UI
+- Confirmada regla de negocio: solo una resena por producto comprado
