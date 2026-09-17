@@ -10,10 +10,12 @@ app = FastAPI(title="Mi Propio Style - Auth Service")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://mi-propio-style.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
 )
 
 app.include_router(auth_router)
