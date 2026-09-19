@@ -98,17 +98,17 @@ def crear_orden(
         try:
             resp_producto = requests.get(f"{CATALOGO_URL}/productos/{item.producto_id}", timeout=5)
         except requests.RequestException:
-            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="No se pudo conectar con el servicio de catálogo")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="No se pudo conectar con el servicio de catÃƒÂ¡logo")
         if resp_producto.status_code != 200:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Producto {item.producto_id} no encontrado en catálogo")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Producto {item.producto_id} no encontrado en catÃƒÂ¡logo")
         producto = resp_producto.json()
 
         try:
             resp_talla = requests.get(f"{CATALOGO_URL}/tallas/{item.talla_id}", timeout=5)
         except requests.RequestException:
-            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="No se pudo conectar con el servicio de catálogo")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="No se pudo conectar con el servicio de catÃƒÂ¡logo")
         if resp_talla.status_code != 200:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Talla {item.talla_id} no encontrada en catálogo")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Talla {item.talla_id} no encontrada en catÃƒÂ¡logo")
         talla = resp_talla.json()
 
         if talla["stock_talla"] < item.cantidad:
@@ -154,29 +154,29 @@ def pagar_orden(
     if orden.estado != "pendiente":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"La orden ya está en estado '{orden.estado}', no se puede pagar",
+            detail=f"La orden ya estÃƒÂ¡ en estado '{orden.estado}', no se puede pagar",
         )
 
-    # Revalidar stock en tiempo real antes de cobrar (pudo cambiar desde que se creó la orden)
+    # Revalidar stock en tiempo real antes de cobrar (pudo cambiar desde que se creÃƒÂ³ la orden)
     for item in orden.items:
         try:
             resp_talla = requests.get(f"{CATALOGO_URL}/tallas/{item.talla_id}", timeout=5)
         except requests.RequestException:
-            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="No se pudo conectar con el servicio de catálogo")
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="No se pudo conectar con el servicio de catÃƒÂ¡logo")
         if resp_talla.status_code != 200:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Talla {item.talla_id} ya no existe en catálogo")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Talla {item.talla_id} ya no existe en catÃƒÂ¡logo")
         talla = resp_talla.json()
         if talla["stock_talla"] < item.cantidad:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Stock insuficiente para la talla {talla['talla']}, intenta de nuevo más tarde",
+                detail=f"Stock insuficiente para la talla {talla['talla']}, intenta de nuevo mÃƒÂ¡s tarde",
             )
 
     # Simular el cobro
     if not procesar_pago_simulado(float(orden.total)):
         raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail="El pago fue rechazado, intenta de nuevo")
 
-    # Descontar stock real en catálogo (solo si el pago fue exitoso)
+    # Descontar stock real en catÃƒÂ¡logo (solo si el pago fue exitoso)
     for item in orden.items:
         try:
             resp = requests.patch(
@@ -209,7 +209,7 @@ def actualizar_estado_orden(
     if datos.estado == schemas.EstadoOrden.pagado:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="El estado 'pagado' solo se puede establecer a través de POST /ordenes/{id}/pagar",
+            detail="El estado 'pagado' solo se puede establecer a travÃƒÂ©s de POST /ordenes/{id}/pagar",
         )
     orden.estado = datos.estado.value
     db.commit()
