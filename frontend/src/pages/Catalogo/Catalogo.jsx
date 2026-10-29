@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { listarProductos } from '../../services/catalogoService';
+import Pagina from '../../components/ui/Pagina/Pagina';
+import Estado from '../../components/ui/Estado/Estado';
+import Button from '../../components/ui/Button/Button';
+import ProductoCard, { ProductoGrid } from '../../components/ui/ProductoCard/ProductoCard';
 import styles from './Catalogo.module.scss';
 
 const TALLAS_DISPONIBLES = ['S', 'M', 'L', 'XL'];
@@ -30,48 +33,48 @@ const Catalogo = () => {
   }, [tallaFiltro]);
 
   return (
-    <div className={styles.catalogo}>
-      <h1>Catálogo</h1>
-
+    <Pagina titulo="Catálogo">
       <div className={styles.filtros}>
         <span>Filtrar por talla:</span>
-        <button
-          className={`${styles.filtroBoton} ${tallaFiltro === '' ? styles.activo : ''}`}
+        <Button
+          tamano="chico"
+          variante={tallaFiltro === '' ? 'primario' : 'secundario'}
           onClick={() => setTallaFiltro('')}
         >
           Todas
-        </button>
+        </Button>
         {TALLAS_DISPONIBLES.map((talla) => (
-          <button
+          <Button
             key={talla}
-            className={`${styles.filtroBoton} ${tallaFiltro === talla ? styles.activo : ''}`}
+            tamano="chico"
+            variante={tallaFiltro === talla ? 'primario' : 'secundario'}
             onClick={() => setTallaFiltro(talla)}
           >
             {talla}
-          </button>
+          </Button>
         ))}
       </div>
 
       {cargando ? (
-        <p className={styles.estado}>Cargando productos...</p>
+        <Estado>Cargando productos...</Estado>
       ) : error ? (
-        <p className={styles.estado}>Error: {error}</p>
+        <Estado tipo="error">Error: {error}</Estado>
       ) : productos.length === 0 ? (
-        <p className={styles.estado}>No hay productos con esa talla.</p>
+        <Estado tipo="vacio">No hay productos con esa talla.</Estado>
       ) : (
-        <div className={styles.grid}>
+        <ProductoGrid>
           {productos.map((producto) => (
-            <Link key={producto.id} to={`/catalogo/${producto.id}`} className={styles.card}>
-              <h3>{producto.nombre}</h3>
-              <p className={styles.precio}>${producto.precio}</p>
-              {producto.descripcion && (
-                <p className={styles.descripcion}>{producto.descripcion}</p>
-              )}
-            </Link>
+            <ProductoCard
+              key={producto.id}
+              id={producto.id}
+              nombre={producto.nombre}
+              precio={producto.precio}
+              descripcion={producto.descripcion}
+            />
           ))}
-        </div>
+        </ProductoGrid>
       )}
-    </div>
+    </Pagina>
   );
 };
 

@@ -2,10 +2,14 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { listarWishlist, eliminarDeWishlist, obtenerProducto } from '../../services/catalogoService';
+import Pagina from '../../components/ui/Pagina/Pagina';
+import Estado from '../../components/ui/Estado/Estado';
+import Button from '../../components/ui/Button/Button';
+import ProductoCard, { ProductoGrid } from '../../components/ui/ProductoCard/ProductoCard';
 import styles from './Wishlist.module.scss';
 
 const Wishlist = () => {
-  const { usuario, token } = useAuth();
+  const { usuario, token, cargando: autenticando } = useAuth();
   const [items, setItems] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
@@ -48,41 +52,54 @@ const Wishlist = () => {
     }
   };
 
-  if (!usuario) {
+  if (autenticando) {
     return (
-      <div className={styles.wishlist}>
-        <p className={styles.estado}>
-          Inicia sesión para ver tu wishlist. <Link to="/login">Ir a login</Link>
-        </p>
-      </div>
+      <Pagina titulo="Mi Wishlist">
+        <Estado>Cargando...</Estado>
+      </Pagina>
     );
   }
 
-  if (cargando) return <p className={styles.estado}>Cargando wishlist...</p>;
-  if (error) return <p className={styles.estado}>Error: {error}</p>;
+  if (!usuario) {
+    return (
+      <Pagina titulo="Mi Wishlist">
+        <Estado tipo="vacio">
+          Inicia sesión para ver tu wishlist. <Link to="/login">Ir a login</Link>
+        </Estado>
+      </Pagina>
+    );
+  }
 
   return (
-    <div className={styles.wishlist}>
-      <h1>Mi Wishlist</h1>
-
-      {items.length === 0 ? (
-        <p className={styles.estado}>Todavía no tienes productos en tu wishlist.</p>
+    <Pagina titulo="Mi Wishlist">
+      {cargando ? (
+        <Estado>Cargando wishlist...</Estado>
+      ) : error ? (
+        <Estado tipo="error">Error: {error}</Estado>
+      ) : items.length === 0 ? (
+        <Estado tipo="vacio">Todavía no tienes productos en tu wishlist.</Estado>
       ) : (
-        <div className={styles.grid}>
+        <ProductoGrid>
           {items.map((item) => (
-            <div key={item.id} className={styles.card}>
-              <Link to={`/catalogo/${item.producto_id}`} className={styles.enlace}>
-                <h3>{item.producto?.nombre || `Producto #${item.producto_id}`}</h3>
-                {item.producto?.precio && <p className={styles.precio}>${item.producto.precio}</p>}
-              </Link>
-              <button className={styles.eliminarBoton} onClick={() => manejarEliminar(item.id)}>
+            <ProductoCard
+              key={item.id}
+              id={item.producto_id}
+              nombre={item.producto?.nombre || `Producto #${item.producto_id}`}
+              precio={item.producto?.precio}
+            >
+              <Button
+                variante="peligro"
+                tamano="chico"
+                className={styles.quitar}
+                onClick={() => manejarEliminar(item.id)}
+              >
                 Quitar
-              </button>
-            </div>
+              </Button>
+            </ProductoCard>
           ))}
-        </div>
+        </ProductoGrid>
       )}
-    </div>
+    </Pagina>
   );
 };
 

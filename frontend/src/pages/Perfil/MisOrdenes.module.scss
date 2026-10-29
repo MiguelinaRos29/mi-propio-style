@@ -1,27 +1,5 @@
 @use '../../styles/variables' as *;
 
-.misOrdenes {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
-
-  h1 {
-    font-family: $font-heading;
-    color: $color-cafe;
-    margin: 0.5rem 0 1.5rem;
-  }
-}
-
-.volver {
-  color: $color-cafe-light;
-  text-decoration: none;
-  font-size: 0.9rem;
-
-  &:hover {
-    color: $color-terracota;
-  }
-}
-
 .lista {
   display: flex;
   flex-direction: column;
@@ -31,7 +9,7 @@
 .orden {
   background-color: $color-blanco;
   border: 1px solid rgba($color-cafe, 0.1);
-  border-radius: 8px;
+  border-radius: $radius-md;
   padding: 1.2rem 1.5rem;
 }
 
@@ -54,18 +32,18 @@
 }
 
 .pagado {
-  background-color: rgba(#2e7d32, 0.15);
-  color: #2e7d32;
+  background-color: rgba($color-exito, 0.15);
+  color: $color-exito;
 }
 
 .pendiente {
   background-color: rgba($color-dorado, 0.25);
-  color: #8a6d1f;
+  color: $color-aviso;
 }
 
 .cancelado {
-  background-color: rgba(#c0392b, 0.12);
-  color: #c0392b;
+  background-color: rgba($color-error, 0.12);
+  color: $color-error;
 }
 
 .total {
@@ -77,10 +55,4 @@
 .fecha {
   color: $color-cafe-light;
   font-size: 0.85rem;
-}
-
-.estado {
-  text-align: center;
-  padding: 2rem;
-  color: $color-cafe-light;
 }

@@ -1,0 +1,16 @@
+@use '../../../styles/variables' as *;
+
+.estado {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: $color-cafe-light;
+
+  a {
+    color: $color-terracota;
+    font-weight: 600;
+  }
+}
+
+.error {
+  color: $color-error;
+}

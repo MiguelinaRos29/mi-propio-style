@@ -1,8 +1,10 @@
 import styles from './Button.module.scss';
 
 // variante: 'primario' | 'secundario' | 'peligro'
+// tamano: 'normal' | 'chico'
 const Button = ({
   variante = 'primario',
+  tamano = 'normal',
   completo = false,
   type = 'button',
   className = '',
@@ -12,6 +14,7 @@ const Button = ({
   const clases = [
     styles.boton,
     styles[variante],
+    tamano === 'chico' ? styles.chico : '',
     completo ? styles.completo : '',
     className,
   ]

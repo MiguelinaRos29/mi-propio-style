@@ -1,96 +1,25 @@
 @use '../../styles/variables' as *;
 
-.misOrdenes {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
-
-  h1 {
-    font-family: $font-heading;
-    color: $color-cafe;
-    margin: 0.5rem 0 1.5rem;
-  }
-}
-
-.volver {
-  color: $color-cafe-light;
-  text-decoration: none;
-  font-size: 0.9rem;
-
-  &:hover {
-    color: $color-terracota;
-  }
-}
-
-.lista {
+.tarjeta {
+  background-color: $color-blanco;
+  border: 1px solid rgba($color-cafe, 0.1);
+  border-radius: $radius-md;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 1rem;
 }
 
-.orden {
-  background-color: $color-blanco;
-  border: 1px solid rgba($color-cafe, 0.1);
-  border-radius: 8px;
-  padding: 1.2rem 1.5rem;
-}
-
-.ordenCabecera {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
+.saludo {
   color: $color-cafe;
-  margin-bottom: 0.5rem;
-}
-
-.badge {
-  font-size: 0.75rem;
-  padding: 0.2rem 0.7rem;
-  border-radius: 12px;
-  background-color: rgba($color-cafe, 0.1);
-  color: $color-cafe-light;
-  font-weight: 600;
-}
-
-.pagada {
-  background-color: rgba(#2e7d32, 0.15);
-  color: #2e7d32;
-}
-
-.pendiente {
-  background-color: rgba($color-dorado, 0.25);
-  color: #8a6d1f;
-}
-
-.cancelada {
-  background-color: rgba(#c0392b, 0.12);
-  color: #c0392b;
-}
-
-.total {
-  color: $color-terracota-dark;
-  font-weight: 600;
-  margin-bottom: 0.2rem;
-}
-
-.fecha {
-  color: $color-cafe-light;
-  font-size: 0.85rem;
-}
-
-.estado {
-  text-align: center;
-  padding: 2rem;
-  color: $color-cafe-light;
+  font-size: 1.1rem;
 }
 
 .enlaceOrdenes {
-  display: block;
   color: $color-terracota;
   text-decoration: none;
   font-weight: 600;
-  margin: 1rem 0 1.5rem;
 
   &:hover {
     color: $color-terracota-dark;

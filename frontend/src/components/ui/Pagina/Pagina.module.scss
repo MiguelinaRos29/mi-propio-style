@@ -1,0 +1,29 @@
+@use '../../../styles/variables' as *;
+
+.pagina {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.estrecha {
+  max-width: 700px;
+}
+
+.titulo {
+  font-family: $font-heading;
+  color: $color-cafe;
+  margin-bottom: 1.5rem;
+}
+
+.atras {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  color: $color-cafe-light;
+  text-decoration: none;
+  font-size: 0.9rem;
+
+  &:hover {
+    color: $color-terracota;
+  }
+}

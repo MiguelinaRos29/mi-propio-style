@@ -1,0 +1,48 @@
+@use '../../../styles/variables' as *;
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background-color: $color-blanco;
+  border: 1px solid rgba($color-cafe, 0.1);
+  border-radius: $radius-md;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba($color-cafe, 0.1);
+  }
+}
+
+.enlace {
+  text-decoration: none;
+  color: inherit;
+
+  h3 {
+    color: $color-cafe;
+    margin-bottom: 0.4rem;
+  }
+
+  &:hover h3 {
+    color: $color-terracota;
+  }
+}
+
+.precio {
+  color: $color-terracota-dark;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.descripcion {
+  color: $color-cafe-light;
+  font-size: 0.9rem;
+}

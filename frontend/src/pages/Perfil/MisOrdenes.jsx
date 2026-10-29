@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { listarOrdenes } from '../../services/ordenesService';
+import Pagina from '../../components/ui/Pagina/Pagina';
+import Estado from '../../components/ui/Estado/Estado';
 import styles from './MisOrdenes.module.scss';
 
 const ESTADO_LABEL = {
@@ -32,19 +33,17 @@ const MisOrdenes = () => {
   }, [token]);
 
   return (
-    <div className={styles.misOrdenes}>
-      <Link to="/perfil" className={styles.volver}>
-        ← Volver a Mi Cuenta
-      </Link>
-
-      <h1>Mis Órdenes</h1>
-
+    <Pagina
+      titulo="Mis Órdenes"
+      ancho="estrecha"
+      atras={{ to: '/perfil', texto: '← Volver a Mi Cuenta' }}
+    >
       {cargando ? (
-        <p className={styles.estado}>Cargando órdenes...</p>
+        <Estado>Cargando órdenes...</Estado>
       ) : error ? (
-        <p className={styles.estado}>Error: {error}</p>
+        <Estado tipo="error">Error: {error}</Estado>
       ) : ordenes.length === 0 ? (
-        <p className={styles.estado}>Todavía no tienes órdenes.</p>
+        <Estado tipo="vacio">Todavía no tienes órdenes.</Estado>
       ) : (
         <div className={styles.lista}>
           {ordenes.map((orden) => (
@@ -63,7 +62,7 @@ const MisOrdenes = () => {
           ))}
         </div>
       )}
-    </div>
+    </Pagina>
   );
 };
 
