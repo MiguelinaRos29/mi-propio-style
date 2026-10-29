@@ -15,21 +15,26 @@ const OjoCerrado = () => (
   </svg>
 );
 
+// como: 'input' (por defecto) | 'textarea' | 'select'
 // Si type="password", añade automáticamente el "ojito" para ver/ocultar el texto.
-const Input = ({ label, type = 'text', ...resto }) => {
+const Input = ({ label, type = 'text', como = 'input', children, ...resto }) => {
   const [visible, setVisible] = useState(false);
-  const esPassword = type === 'password';
+  const esPassword = como === 'input' && type === 'password';
   const tipoReal = esPassword && visible ? 'text' : type;
+  const Elemento = como;
+  const propsTipo = como === 'input' ? { type: tipoReal } : {};
 
   return (
     <label className={styles.campo}>
       {label}
       <span className={styles.contenedor}>
-        <input
+        <Elemento
           className={`${styles.input} ${esPassword ? styles.conOjo : ''}`}
-          type={tipoReal}
+          {...propsTipo}
           {...resto}
-        />
+        >
+          {children}
+        </Elemento>
         {esPassword && (
           <button
             type="button"
