@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import Button from '../../components/ui/Button/Button';
+import Input from '../../components/ui/Input/Input';
 import styles from './Auth.module.scss';
 
 const Register = () => {
@@ -33,40 +35,34 @@ const Register = () => {
 
         {error && <p className={styles.error}>{error}</p>}
 
-        <label>
-          Nombre
-          <input
-            type="text"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            required
-          />
-        </label>
+        <Input
+          label="Nombre"
+          type="text"
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          required
+        />
 
-        <label>
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </label>
+        <Input
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-        <label>
-          Contraseña
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-          />
-        </label>
+        <Input
+          label="Contraseña"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          minLength={6}
+        />
 
-        <button type="submit" disabled={enviando}>
+        <Button type="submit" completo disabled={enviando}>
           {enviando ? 'Creando cuenta...' : 'Registrarme'}
-        </button>
+        </Button>
 
         <p className={styles.enlace}>
           ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>

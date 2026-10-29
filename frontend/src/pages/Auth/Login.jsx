@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import Button from '../../components/ui/Button/Button';
+import Input from '../../components/ui/Input/Input';
 import styles from './Auth.module.scss';
 
 const Login = () => {
@@ -32,29 +34,25 @@ const Login = () => {
 
         {error && <p className={styles.error}>{error}</p>}
 
-        <label>
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </label>
+        <Input
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-        <label>
-          Contraseña
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
+        <Input
+          label="Contraseña"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
 
-        <button type="submit" disabled={enviando}>
+        <Button type="submit" completo disabled={enviando}>
           {enviando ? 'Entrando...' : 'Entrar'}
-        </button>
+        </Button>
 
         <p className={styles.enlace}>
           ¿No tienes cuenta? <Link to="/registro">Regístrate</Link>

@@ -1,0 +1,50 @@
+@use '../../../styles/variables' as *;
+
+.boton {
+  border: 1px solid transparent;
+  border-radius: $radius-sm;
+  padding: 0.75rem 1rem;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.primario {
+  background-color: $color-terracota;
+  color: $color-blanco;
+
+  &:hover:not(:disabled) {
+    background-color: $color-terracota-dark;
+  }
+}
+
+.secundario {
+  background-color: transparent;
+  color: $color-terracota;
+  border-color: $color-terracota;
+
+  &:hover:not(:disabled) {
+    background-color: rgba($color-terracota, 0.08);
+  }
+}
+
+.peligro {
+  background-color: transparent;
+  color: $color-error;
+  border-color: $color-error;
+
+  &:hover:not(:disabled) {
+    background-color: rgba($color-error, 0.08);
+  }
+}
+
+.completo {
+  width: 100%;
+}

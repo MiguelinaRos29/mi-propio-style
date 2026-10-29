@@ -1,0 +1,56 @@
+@use '../../../styles/variables' as *;
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: $color-cafe-light;
+}
+
+.contenedor {
+  position: relative;
+  display: flex;
+}
+
+.input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid rgba($color-cafe, 0.2);
+  border-radius: $radius-sm;
+  background-color: $color-blanco;
+  color: $color-texto;
+  font-family: inherit;
+  font-size: 1rem;
+
+  &:focus {
+    outline: none;
+    border-color: $color-terracota;
+  }
+}
+
+.conOjo {
+  padding-right: 2.6rem;
+}
+
+.ojo {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  padding: 0.25rem;
+  background: none;
+  border: none;
+  color: $color-cafe-light;
+  cursor: pointer;
+
+  &:hover {
+    color: $color-terracota;
+  }
+
+  svg {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+}
