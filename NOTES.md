@@ -374,3 +374,30 @@ Backend y frontend de reseñas quedan validados por completo.
 - Deploy con URLs en vivo
 - Revisión de responsive
 - Revisar qué key de Supabase usa cada `.env` (anon vs service_role)
+
+## [29/10/2026] Feedback del capstone (94,3 %) y correcciones posteriores
+
+**Resultado:** 660/700 (94,3 %) en la hoja de calificación del 23/10/2026. Puntos perdidos: Criteria 4 (eficiencia) 120/150 y Criteria 5 (documentación) 40/50.
+
+**Feedback del evaluador y qué se hizo:**
+- *Login (ProtectedRoute redirigía a /login sin credenciales cargadas):* causa raíz confirmada. `login()` guardaba el token y `Login.jsx` navegaba a `/perfil` antes de que `usuario` estuviera cargado, así que `ProtectedRoute` rebotaba al login. Solución: `login()` ahora trae el usuario (`/me`) antes de terminar, y la restauración de sesión solo corre al montar la app.
+- *Token con expiración de 1 hora:* el valor por defecto de `ACCESS_TOKEN_EXPIRE_MINUTES` pasó de 60 a 1440 (24 h) en `services/auth/app/security.py`. La variable de entorno en Render, si existe, tiene prioridad sobre el valor por defecto.
+- *Retrasos repetidos entre servicios:* los 3 servicios están en el plan gratuito de Render, que apaga cada servicio tras ~15 min sin tráfico (arranque en frío de 30-60 s). Solución parcial: endpoint `GET /health` en auth, catálogo y órdenes, y ping de calentamiento desde `App.jsx` que despierta los 3 servicios en paralelo al abrir la web. No elimina el arranque en frío, pero lo reduce a una sola espera inicial. Un monitor externo (UptimeRobot) sobre `/health` queda como opción; Render limita las horas de instancia del plan gratuito, así que se descartó por ahora.
+- *Documentación del proyecto:* README.md reescrito (qué hace, arquitectura, tecnologías, cómo ejecutarlo, decisiones de diseño, limitaciones conocidas, próximos pasos y enlaces en vivo). `frontend/.env.example` corregido: tenía nombres de variable (`VITE_*_URL`) distintos a los que usa el código (`VITE_*_API_URL`).
+- *Uniformidad del front-end:* se creó una librería de componentes en `frontend/src/components/ui/` (`Button`, `Input` con botón de mostrar/ocultar contraseña, `Pagina`, `Estado`, `ProductoCard`/`ProductoGrid`) y tokens de color/radio en `_variables.scss`. Login, Registro, Catálogo, Wishlist, Mis Órdenes y Mi Cuenta ya los usan. Se eliminó CSS duplicado (`.estado` en 5 archivos, `.card` en 2, colores de estado escritos a mano en varios).
+- *Pendiente:* `ProductoDetalle` (7 botones propios y su propio `.estado`) y pruebas de casos límite.
+
+**Escrito por IA (Claude), pegado y probado por mí:**
+- `frontend/src/context/AuthContext.jsx` (fix del login)
+- `services/auth/app/security.py` (cambio del valor por defecto de expiración)
+- `services/*/app/main.py` (`/health` en los 3 servicios; además, corrección de acentos corruptos en los mensajes de error de `ordenes/main.py`)
+- `frontend/src/App.jsx` (ping de calentamiento)
+- `frontend/src/components/ui/*` y `frontend/src/styles/_variables.scss`
+- `frontend/src/pages/Auth/*`, `Catalogo/Catalogo.*`, `Wishlist/Wishlist.*`, `Perfil/Perfil.*`, `Perfil/MisOrdenes.*` (refactor para usar los componentes compartidos)
+- `README.md` y `frontend/.env.example`
+
+**Diagnóstico y lecciones del día:**
+- `Perfil.module.scss` era una copia de `MisOrdenes.module.scss` y no tenía `.perfil` ni `.botonSalir`, por eso Mi Cuenta se veía sin estilos.
+- Un clon nuevo del repo no trae `frontend/.env`: sin él, `import.meta.env.VITE_*` es `undefined` y las peticiones van a `localhost:5173/undefined/...` (síntomas: "Ocurrió un error inesperado" o `Unexpected token '<'`). Hay que crearlo en `frontend/` (UTF-8 sin BOM) y reiniciar `npm run dev`.
+- `npm run build` antes de cada push evita romper el despliegue de Vercel; detectó un `Button.module.scss` creado en la carpeta equivocada.
+- En CSS Modules, un selector como `.authForm input` afecta a todos los `input` descendientes, incluidos los de componentes hijos; por eso se quitó de `Auth.module.scss`.
