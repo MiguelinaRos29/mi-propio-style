@@ -8,9 +8,7 @@ E-market multivendedor de moda y accesorios construido con arquitectura de micro
 > Los servicios están en un plan gratuito de hosting: la primera petición tras un rato de inactividad puede tardar unos segundos mientras "despierta" el servicio.
 
 <img src="docs/inicio.png" alt="Página de inicio de Mi Propio Style" width="420">
-
-<!-- Pendiente: añadir una captura del catálogo en docs/catalogo.png -->
-<!-- ![Captura del catálogo](docs/catalogo.png) -->
+<img src="docs/catalogo.png" alt="Catálogo de Mi Propio Style con filtro por talla" width="420">
 
 ## Qué hace
 
@@ -99,6 +97,10 @@ Detalle completo de cada decisión en [`NOTES.md`](NOTES.md).
 - Panel de vendedor para gestionar productos y órdenes.
 - Tests automatizados.
 - Mantener los servicios activos para eliminar los retrasos de arranque.
+
+## Licencia
+
+Distribuido bajo la licencia [MIT](LICENSE).
 
 ## Autora
 
