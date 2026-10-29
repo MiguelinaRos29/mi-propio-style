@@ -8,14 +8,16 @@ export const AuthProvider = ({ children }) => {
   const [usuario, setUsuario] = useState(null);
   const [cargando, setCargando] = useState(true);
 
+  // Solo al abrir la app: restaurar la sesión guardada en localStorage
   useEffect(() => {
-    const cargarUsuario = async () => {
-      if (!token) {
+    const restaurarSesion = async () => {
+      const tokenGuardado = localStorage.getItem('token');
+      if (!tokenGuardado) {
         setCargando(false);
         return;
       }
       try {
-        const datosUsuario = await obtenerUsuarioActual(token);
+        const datosUsuario = await obtenerUsuarioActual(tokenGuardado);
         setUsuario(datosUsuario);
       } catch {
         localStorage.removeItem('token');
@@ -26,13 +28,17 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
-    cargarUsuario();
-  }, [token]);
+    restaurarSesion();
+  }, []);
 
   const login = async (email, password) => {
     const data = await iniciarSesion(email, password);
+    // Cargamos el usuario ANTES de terminar el login, para que cuando
+    // Login.jsx navegue a /perfil, ProtectedRoute ya tenga token y usuario.
+    const datosUsuario = await obtenerUsuarioActual(data.access_token);
     localStorage.setItem('token', data.access_token);
     setToken(data.access_token);
+    setUsuario(datosUsuario);
   };
 
   const registro = async (datos) => {

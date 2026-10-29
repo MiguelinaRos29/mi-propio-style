@@ -47,6 +47,11 @@ SERVICE_KEY = os.getenv("SERVICE_KEY")
 ORDENES_SERVICE_URL = os.getenv("ORDENES_SERVICE_URL")  # ej: http://localhost:8001
 
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
 def verificar_service_key(x_service_key: str = Header(...)):
     if x_service_key != SERVICE_KEY:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Clave de servicio inválida")
