@@ -7,7 +7,8 @@ E-market multivendedor de moda y accesorios construido con arquitectura de micro
 
 > Los servicios están en un plan gratuito de hosting: la primera petición tras un rato de inactividad puede tardar unos segundos mientras "despierta" el servicio.
 
-![Captura del catálogo](docs/catalogo.png)
+<img src="docs/inicio.png" alt="Página de inicio de Mi Propio Style" width="420">
+<img src="docs/catalogo.png" alt="Catálogo de Mi Propio Style con filtro por talla" width="420">
 
 ## Qué hace
 
@@ -41,7 +42,7 @@ Tres microservicios independientes y un frontend:
 **Base de datos:** PostgreSQL (Supabase)
 **Autenticación:** JWT (python-jose) + bcrypt
 **Extra aprendido fuera del curso:** APScheduler (jobs periódicos) y Resend (email transaccional)
-**Hosting:** [Vercel / Render / otro]
+**Hosting:** Vercel (frontend) · Render (APIs) · Supabase (PostgreSQL)
 
 ## Cómo ejecutarlo en local
 
@@ -62,7 +63,15 @@ cp .env.example .env
 npm run dev
 ```
 
-Variables de entorno por servicio: conexión a la base de datos (`DATABASE_URL`), `SECRET_KEY` y `ACCESS_TOKEN_EXPIRE_MINUTES` (auth), `SERVICE_KEY` y `CATALOGO_URL` (órdenes), `RESEND_API_KEY` (catálogo).
+Cada servicio incluye un `.env.example` documentado con todas sus variables:
+
+| Servicio | Variables principales |
+|---|---|
+| `services/auth` | `DATABASE_URL`, `SECRET_KEY`, `ACCESS_TOKEN_EXPIRE_MINUTES` |
+| `services/catalogo` | `DATABASE_URL`, `SECRET_KEY`, `SERVICE_KEY`, `ORDENES_SERVICE_URL`, `RESEND_API_KEY` |
+| `services/ordenes` | `DATABASE_URL`, `SECRET_KEY`, `SERVICE_KEY`, `CATALOGO_URL` |
+
+`SECRET_KEY` debe ser la misma en los tres servicios (auth firma los JWT; catálogo y órdenes los validan) y `SERVICE_KEY` la misma en catálogo y órdenes. No subas nunca un `.env` real al repositorio.
 
 La documentación interactiva de cada API está en `/docs` (Swagger).
 
@@ -88,6 +97,10 @@ Detalle completo de cada decisión en [`NOTES.md`](NOTES.md).
 - Panel de vendedor para gestionar productos y órdenes.
 - Tests automatizados.
 - Mantener los servicios activos para eliminar los retrasos de arranque.
+
+## Licencia
+
+Distribuido bajo la licencia [MIT](LICENSE).
 
 ## Autora
 
