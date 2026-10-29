@@ -401,3 +401,18 @@ Backend y frontend de reseñas quedan validados por completo.
 - Un clon nuevo del repo no trae `frontend/.env`: sin él, `import.meta.env.VITE_*` es `undefined` y las peticiones van a `localhost:5173/undefined/...` (síntomas: "Ocurrió un error inesperado" o `Unexpected token '<'`). Hay que crearlo en `frontend/` (UTF-8 sin BOM) y reiniciar `npm run dev`.
 - `npm run build` antes de cada push evita romper el despliegue de Vercel; detectó un `Button.module.scss` creado en la carpeta equivocada.
 - En CSS Modules, un selector como `.authForm input` afecta a todos los `input` descendientes, incluidos los de componentes hijos; por eso se quitó de `Auth.module.scss`.
+
+
+### [29/10/2026] Paso 3: uniformidad en ProductoDetalle
+
+Última página que seguía con botones, estados y colores propios. Ahora usa los componentes compartidos de `components/ui/`.
+
+- **`Input`:** admite `select` y `textarea` mediante la prop `como`, con el mismo estilo que los campos del login.
+- **`Estado`:** nueva variante `compacto` (mensajes dentro de una página) y tipo `exito`.
+- **`ProductoDetalle`:** usa `Pagina`, `Estado`, `Button` e `Input`. El SCSS quedó reducido a los estilos propios del detalle, con colores y radios tomados de los tokens.
+- **Casos límite resueltos:**
+  - Ya no parpadea "Inicia sesión" mientras se restaura la sesión.
+  - Se pide confirmación antes de eliminar una reseña.
+  - Las estrellas llevan texto accesible (`aria-label`).
+- **Resultado:** todas las páginas del front comparten botones, campos, estados y paleta, como pidió el evaluador.
+- **Autoría:** refactor hecho con ayuda de Claude; lo revisé, lo compilé y lo probé en local antes de desplegar.
