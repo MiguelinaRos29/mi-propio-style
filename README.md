@@ -7,7 +7,9 @@ E-market multivendedor de moda y accesorios construido con arquitectura de micro
 
 > Los servicios están en un plan gratuito de hosting: la primera petición tras un rato de inactividad puede tardar unos segundos mientras "despierta" el servicio.
 
-<!-- Pendiente: añadir una captura en docs/catalogo.png y descomentar la línea siguiente -->
+<img src="docs/inicio.png" alt="Página de inicio de Mi Propio Style" width="420">
+
+<!-- Pendiente: añadir una captura del catálogo en docs/catalogo.png -->
 <!-- ![Captura del catálogo](docs/catalogo.png) -->
 
 ## Qué hace
