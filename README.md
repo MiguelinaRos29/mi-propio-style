@@ -75,6 +75,18 @@ Cada servicio incluye un `.env.example` documentado con todas sus variables:
 
 La documentación interactiva de cada API está en `/docs` (Swagger).
 
+## Tests y CI
+
+Auth y órdenes tienen tests con pytest que usan una base SQLite temporal, así que no necesitan PostgreSQL ni claves reales:
+
+```bash
+cd services/auth        # o services/ordenes
+pip install -r requirements.txt -r ../requirements-dev.txt
+python -m pytest
+```
+
+En cada push y pull request, GitHub Actions (`.github/workflows/ci.yml`) ejecuta esos tests y también el lint y el build del frontend.
+
 ## Decisiones de diseño y problemas resueltos
 
 - **Pago simulado y reemplazable:** la lógica del cobro está aislada en `pagos.py`; sustituirla por Stripe o PayPal no tocaría el resto del flujo.
@@ -95,7 +107,7 @@ Detalle completo de cada decisión en [`NOTES.md`](NOTES.md).
 
 - Integrar un gateway de pago real.
 - Panel de vendedor para gestionar productos y órdenes.
-- Tests automatizados.
+- Ampliar los tests: hoy cubren auth y órdenes; faltan catálogo y el frontend.
 - Mantener los servicios activos para eliminar los retrasos de arranque.
 
 ## Licencia
